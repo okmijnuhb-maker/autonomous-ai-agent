@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 from groq import Groq
 
 # paths
-BASE_PATH = "C:/educational files/advanced_agent"
+from pathlib import Path
+BASE_PATH = str(Path(__file__).resolve().parent.parent)
 ENV_PATH = f"{BASE_PATH}/.env"
 CHROMA_PATH = f"{BASE_PATH}/memory/chroma_store"
 SEARCH_HISTORY_PATH = f"{BASE_PATH}/memory/search_history.json"
