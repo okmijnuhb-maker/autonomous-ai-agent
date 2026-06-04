@@ -1,0 +1,15 @@
+groq
+google-genai
+python-dotenv
+chromadb
+psutil
+pandas
+requests
+wikipedia-api
+ddgs
+PyPDF2
+openpyxl
+fastapi
+uvicorn
+jinja2
+python-multipart

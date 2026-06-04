@@ -1,0 +1,242 @@
+[
+  {
+    "timestamp": "2026-06-02 18:51:03",
+    "query": "what is quantum computing",
+    "sub_queries": [
+      "what is quantum computing",
+      "quantum computing definition",
+      "how does quantum computing work"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Quantum_computing",
+      "https://www.nist.gov/quantum-information-science/quantum-computing-explained",
+      "https://www.techtarget.com/whatis/definition/quantum-computing"
+    ],
+    "summary": "**Definition of Quantum Computing:**\nQuantum computing is a branch of physics that harnesses the principles of quantum mechanics to perform calculations and operations on data. It is based on the strange and often counterintuitive laws that govern the universe at its smallest scales and coldest temperatures (Source: NIST).\n\n**How Quantum Computing Works:**\nQuantum computers work by using quantum bits or qubits, which are the fundamental units of quantum information. Qubits are unique because they can exist in multiple states simultaneously, allowing for parallel processing and potentially solving complex problems more efficiently than classical computers (Source: IBM).\n\n**Confirmed Facts:**\n\n1. Quantum computing is a field of research that combines physics, computer science, and engineering to develop new types of computers (Source: Wikipedia).\n2. Quantum computers have the potential to solve certain problems much faster than classical computers, making them useful for applications such as cryptography, optimization, and simulation (Source: TechTarget).\n3. Quantum computing is still an emerging field, and significant technical challenges need to be overcome before it can be widely adopted (Source: IBM).\n\n**Uncertain Claims:**\nSome sources claim that quantum computing will revolutionize various fields, such as medicine, finance, and climate modeling, but these claims are still speculative and require further research to confirm (Source: Pioneering Minds, Geeky Gadgets).\n\n**Reputable Sources:**\nFor more information on quantum computing, reputable sources such as NIST, IBM, and Wikipedia provide comprehensive guides and explanations. These sources are considered more credible than others, such as Geeky Gadgets and Pioneering Minds, which may provide more speculative or introductory information.\n\nIn conclusion, quantum computing is a complex and emerging field that has the potential to solve certain problems more efficiently than classical computers. While there are many confirmed facts about quantum computing, some claims about its potential applications and benefits are still uncertain and require further research."
+  },
+  {
+    "timestamp": "2026-06-02 18:51:27",
+    "query": "how does it compare to classical computing",
+    "sub_queries": [
+      "quantum computing vs classical computing",
+      "comparison of quantum and classical computing principles",
+      "classical computing limitations and quantum computing advantages"
+    ],
+    "result_count": 10,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Quantum_computing",
+      "https://www.techtarget.com/searchdatacenter/tip/Classical-vs-quantum-computing-What-are-the-differences",
+      "https://www.berkeleynucleonics.com/august-23-2024-quantum-computing-vs-classical-computing/"
+    ],
+    "summary": "**Comparison of Quantum Computing and Classical Computing**\n\nQuantum computing and classical computing differ significantly in their principles, operations, and capabilities. The key differences between the two are:\n\n1. **Basic Principle**: Classical computers process information using bits that exist as definite 0s or 1s, whereas quantum computers use qubits that can exist in superposition (0, 1, or both simultaneously) and leverage entanglement (Source 6, Source 8).\n2. **Compute Power**: Classical computers' compute power increases linearly with the number of transistors, whereas quantum computers' compute power increases exponentially with the number of qubits (Source 2).\n3. **Problem-Solving**: Quantum computing excels in areas like cryptography, optimization, and material science, where classical computers struggle to find efficient solutions (Source 9).\n4. **Scalability**: A quantum computer with 50 qubits can evaluate over a quadrillion states simultaneously, a task impossible for classical computers (Source 4).\n\n**Current State of Quantum Computing**\n\nAs of 2023, classical computers outperform quantum computers for all real-world applications, despite quantum computers' potential to speed up solutions to particular mathematical problems (Source 1).\n\n**Key Takeaways**\n\n* Quantum computing has the potential to solve complex problems more efficiently than classical computing.\n* Quantum computers require unique operating conditions and are still in the early stages of development.\n* Classical computers remain superior for practical tasks, but quantum computing may offer advantages in specific areas.\n\nSources:\n\n* Source 1: Quantum computing - Wikipedia\n* Source 2: Classical vs. quantum computing: What are the differences? | TechTarget\n* Source 4: Quantum Computing vs Classical Computing: Key Differences\n* Source 6: Classical Computing vs Quantum Computing - Top 8 Differences\n* Source 8: Quantum Computing vs Classical Computing - What\u2019s the Real Difference\n* Source 9: Quantum Computing vs Classical Computing: Key Differences\n\nNote: The information provided is based on the search results and is accurate as of the knowledge cutoff date. However, the field of quantum computing is rapidly evolving, and new developments may have occurred since the knowledge cutoff date."
+  },
+  {
+    "timestamp": "2026-06-03 11:21:34",
+    "query": "Search latest AI news",
+    "sub_queries": [
+      "latest AI news",
+      "recent artificial intelligence updates",
+      "current AI trends and developments"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://www.reuters.com/technology/artificial-intelligence/",
+      "https://techcrunch.com/category/artificial-intelligence/",
+      "https://www.hostinger.com/ng/tutorials/software-development-trends"
+    ],
+    "summary": "**Latest AI News: Trends, Developments, and Breakthroughs**\n\nThe latest AI news encompasses a wide range of topics, including major partner shifts, new medicine, chipmakers' earnings, cybersecurity fears, and the transformation of software development (Source 1: Reuters, Source 2: TechCrunch). According to recent reports, AI is expected to play a significant role in shaping the future of technology, business, and society (Source 7: Forbes Advisor).\n\n**Confirmed Facts:**\n\n1. **AI-Native Development Platforms**: Gartner reports that AI-Native Development Platforms are empowering small teams to build software using generative AI, which is fast, flexible, and increasingly enterprise-ready (Source 4: Gartner).\n2. **Top Strategic Technology Trends for 2026**: Gartner has identified 10 top strategic technology trends for 2026, including AI-Native Development Platforms, and provides actionable guidance for 2026 and beyond (Source 4: Gartner).\n3. **AI Statistics and Trends**: Forbes Advisor has compiled a list of 22 top AI statistics and trends that will determine the state of technology, business, and society in the upcoming years (Source 7: Forbes Advisor).\n\n**Uncertain Claims and Developments:**\n\n1. **Meta's Hiring of OpenAI Researchers**: There are reports that Meta has hired four more OpenAI researchers, but this information is not confirmed (Source 8: Economic Times).\n2. **OpenAI's ChatGPT Issues**: Users have reported issues with loading prompts on OpenAI's ChatGPT, but the cause and resolution of these issues are unclear (Source 8: Economic Times).\n3. **Apple's Plans for AI**: There are rumors that Apple plans to open up its AI capabilities, but the details and timeline of these plans are uncertain (Source 8: Economic Times).\n\n**Additional Resources:**\n\nFor the latest AI news and developments, readers can visit the following sources:\n\n* Reuters: https://www.reuters.com/technology/artificial-intelligence/\n* TechCrunch: https://techcrunch.com/category/artificial-intelligence/\n* Gartner: https://www.gartner.com/en/articles/top-technology-trends-2026\n* Forbes Advisor: https://www.forbes.com/advisor/business/ai-statistics/\n* Google News: https://news.google.com/topics/CAAqJAgKIh5DQkFTRUFvSEwyMHZNRzFyZWhJRlpXNHRSMElvQUFQAQ\n\nNote: The information provided is based on the latest available data and may change over time. Readers are advised to consult multiple sources to stay up-to-date with the latest AI news and developments."
+  },
+  {
+    "timestamp": "2026-06-03 11:31:21",
+    "query": "who is the cm of telangana state",
+    "sub_queries": [
+      "Telangana Chief Minister",
+      "CM of Telangana state",
+      "Telangana state government leader"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Chief_Minister_of_Telangana",
+      "https://en.wikipedia.org/wiki/Revanth_Reddy",
+      "https://en.wikipedia.org/wiki/K._Chandrashekar_Rao"
+    ],
+    "summary": "Based on the provided search results, the current Chief Minister of Telangana state is Revanth Reddy. This information is confirmed by Source 6, a YouTube video showing Revanth Reddy taking oath as the Chief Minister of Telangana.\n\nPrevious Chief Ministers of Telangana include K. Chandrashekar Rao, who served as the first Chief Minister of Telangana for almost ten years (Source 3). \n\nIt is worth noting that the information available may not be up-to-date, and the current Chief Minister may have changed since the last update of the sources. However, as of the latest available information, Revanth Reddy is the Chief Minister of Telangana (Source 6).\n\nSources:\n- Source 6: WATCH | Revanth Reddy takes oath as Telangana chief minister\n- Source 3: K. Chandrashekar Rao - Wikipedia \n\nConfirmed facts:\n- Revanth Reddy is the current Chief Minister of Telangana.\n- K. Chandrashekar Rao was the first Chief Minister of Telangana.\n\nUncertain claims: None. The information provided is based on confirmed sources and does not contain any uncertain claims."
+  },
+  {
+    "timestamp": "2026-06-03 11:32:59",
+    "query": "who is pm of india",
+    "sub_queries": [
+      "current Prime Minister of India",
+      "India Prime Minister name",
+      "who is the Prime Minister of India"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Prime_Minister_of_India",
+      "https://en.wikipedia.org/wiki/Narendra_Modi",
+      "https://en.wikipedia.org/wiki/List_of_prime_ministers_of_India"
+    ],
+    "summary": "**Confirmed Fact:** The current Prime Minister of India is Narendra Modi.\n\nThis information is consistently confirmed by multiple reliable sources, including:\n- Source 1: Prime Minister of India - Wikipedia (https://en.wikipedia.org/wiki/Prime_Minister_of_India)\n- Source 2: Narendra Modi - Wikipedia (https://en.wikipedia.org/wiki/Narendra_Modi)\n- Source 6: Know the PM - Prime Minister of India (https://www.pmindia.gov.in/en/pms-profile/)\n- Source 7: Prime Minister of India (https://www.pmindia.gov.in/en/)\n- Source 9: List of All Prime Ministers of India (1947-2026) - Jagran Josh (https://m.jagranjosh.com/general-knowledge/list-of-all-prime-ministers-of-india-1473165149-1)\n\n**Additional Confirmed Facts:**\n- Narendra Modi has been serving as the Prime Minister of India since 2014. (Source 1, Source 2)\n- He is the 14th Prime Minister of India. (Source 8: Narendra Modi | NarendraModi.in Official Website of Prime Minister, https://www.narendramodi.in/)\n- Modi was sworn-in as India\u2019s Prime Minister for the third time on 9th June 2024. (Source 7)\n\n**Uncertain Claims:**\n- The claim about the elimination of poverty at a record pace under Modi's leadership, as noted by leading international agencies, requires further verification. (Source 6)\n\nIn conclusion, based on the provided sources, Narendra Modi is the current Prime Minister of India, a fact consistently confirmed across multiple reliable sources."
+  },
+  {
+    "timestamp": "2026-06-03 11:33:24",
+    "query": "who won ipl 20206",
+    "sub_queries": [
+      "IPL 2020 winner",
+      "Indian Premier League 2020 champion",
+      "2020 IPL winner team"
+    ],
+    "result_count": 10,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/2020_Indian_Premier_League_final",
+      "https://en.wikipedia.org/wiki/2020_Indian_Premier_League",
+      "https://en.wikipedia.org/wiki/List_of_Indian_Premier_League_seasons_and_results"
+    ],
+    "summary": "The winner of the 2020 Indian Premier League (IPL) is the Mumbai Indians. This information is confirmed by multiple sources, including Wikipedia (Sources 1, 2, 3, 5, and 7), Cricbuzz (Source 6), and Olympics.com (Source 7).\n\nAccording to these sources, the Mumbai Indians defeated the Delhi Capitals in the final, which was played on November 10, 2020, at the Dubai International Cricket Stadium in Dubai (Sources 1, 5, and 9). This was the Mumbai Indians' fifth IPL title (Sources 3 and 7).\n\nThe following facts are confirmed:\n\n1. The Mumbai Indians won the 2020 IPL title.\n2. The final match was played between the Mumbai Indians and the Delhi Capitals on November 10, 2020.\n3. The match was held at the Dubai International Cricket Stadium in Dubai.\n\nThese facts are supported by multiple sources, including Wikipedia, Cricbuzz, and Olympics.com. There is no uncertainty or conflicting information regarding these facts.\n\nSources:\n\n* Wikipedia (Sources 1, 2, 3, 5)\n* Cricbuzz (Source 6)\n* Olympics.com (Source 7)\n* ESPN Cricinfo (Source 9)"
+  },
+  {
+    "timestamp": "2026-06-03 11:33:57",
+    "query": "i am aksing baout 2026",
+    "sub_queries": [
+      "2026 Indian Premier League winner",
+      "2026 IPL final match details",
+      "2026 IPL champion team"
+    ],
+    "result_count": 11,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/2026_Indian_Premier_League",
+      "https://en.wikipedia.org/wiki/2026_Indian_Premier_League_final",
+      "https://www.ipl.com/series/indian-premier-league-2026-129908"
+    ],
+    "summary": "**2026 Indian Premier League Overview**\n\nThe 2026 Indian Premier League (IPL) was the 19th edition of the professional Twenty20 cricket league, featuring 10 teams competing in 74 matches from March 28 to May 31, 2026, across 13 venues (Source 1: Wikipedia).\n\n**Confirmed Facts**\n\n1. **Tournament Schedule**: The tournament took place from March 28 to May 31, 2026 (Source 1: Wikipedia, Source 3: IPL.com).\n2. **Number of Teams and Matches**: 10 teams participated in 74 matches (Source 1: Wikipedia).\n3. **Final Match**: The final match was played on May 31, 2026, at the Narendra Modi Stadium in Ahmedabad, India (Source 2: Wikipedia).\n4. **Winner**: Royal Challengers Bengaluru (RCB) won the 2026 IPL title, defeating Gujarat Titans (GT) in the final (Source 4: IPL.com, Source 8: Yahoo Sports).\n\n**Award Winners**\n\n1. **Vaibhav Sooryavanshi**: Swept top honors, including the Player of the Tournament award (Source 4: IPL.com).\n2. **Manish Pandey**: Won the Best Catch award (Source 4: IPL.com).\n3. **Punjab Kings**: Received the Fair Play Award (Source 4: IPL.com).\n\n**Prize Money**\n\n1. **Total Prize Pool**: \u20b946.5 crore (Source 6: Financial Express).\n2. **Champions' Prize Money**: RCB took home \u20b920 crore as the champions (Source 6: Financial Express).\n\n**Sources**\n\n* Wikipedia (Source 1, Source 2)\n* IPL.com (Source 3, Source 4)\n* Yahoo Sports (Source 8)\n* Financial Express (Source 6)\n\nNote: The information provided is based on the available sources and is subject to change if new information becomes available."
+  },
+  {
+    "timestamp": "2026-06-03 11:34:40",
+    "query": "who won ipl 2026 final4",
+    "sub_queries": [
+      "IPL 2026 final winner",
+      "IPL 2026 final result",
+      "IPL 2026 final four teams"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/2026_Indian_Premier_League_final",
+      "https://www.bbc.com/sport/cricket/articles/cdxp0pne2nzo",
+      "https://www.hindustantimes.com/cricket/ipl/orange-cap-winner"
+    ],
+    "summary": "**Confirmed Facts:**\n\n1. The 2026 Indian Premier League (IPL) final was played on May 31, 2026, at the Narendra Modi Stadium in Ahmedabad, India. (Source 1: Wikipedia, Source 2: BBC Sport)\n2. The Royal Challengers Bengaluru (RCB) won the 2026 IPL final by defeating the Gujarat Titans (GT) by 5 wickets. (Source 2: BBC Sport, Source 6: ESPNcricinfo, Source 7: Cricbuzz)\n3. Virat Kohli scored an unbeaten 75 runs for RCB in the final. (Source 2: BBC Sport, Source 7: Cricbuzz)\n\n**Uncertain Claims:**\n\n1. Some sources suggest that RCB was looking to defend their IPL title in the 2026 final, implying that they were the champions of the previous season. However, this information is not confirmed by all sources. (Source 4: Livemint, Source 5: ABP Live)\n2. There are mentions of other players and teams in the context of the 2026 IPL, but these are not directly related to the final match. (Source 3: Hindustantimes, Source 8: ESPNcricinfo, Source 9: Times of India)\n\n**Sources:**\n\nThe information is based on 12 sources, including:\n\n* Wikipedia (Source 1)\n* BBC Sport (Source 2)\n* Hindustantimes (Source 3)\n* Livemint (Source 4)\n* ABP Live (Source 5)\n* ESPNcricinfo (Source 6 and Source 8)\n* Cricbuzz (Source 7)\n* Times of India (Source 9)\n* IPLT20 (Source 10)\n* ESPNcricinfo (Source 11)\n* Hindustantimes (Source 12)\n\nNote: The confirmed facts are based on multiple sources, while the uncertain claims are based on single or limited sources."
+  },
+  {
+    "timestamp": "2026-06-03 11:36:06",
+    "query": "which party won the 2024 Indian general elections",
+    "sub_queries": [
+      "2024 Indian general election results",
+      "Indian general election 2024 winner",
+      "2024 India election party winner"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/2004_Indian_general_election_results_by_party",
+      "https://en.wikipedia.org/wiki/Results_of_the_2024_Indian_general_election",
+      "https://en.wikipedia.org/wiki/2024_Indian_general_election_in_Tamil_Nadu"
+    ],
+    "summary": "Based on the search results, the 2024 Indian general elections were held in multiple phases between April and June 2024. The results were announced on June 4 and 5, 2024 (Source 2: Wikipedia).\n\nAccording to the sources, the elections were held to constitute the 18th Lok Sabha, with 543 members to be elected (Source 2: Wikipedia). The elections were held in various states, including Tamil Nadu (Source 3: Wikipedia), Odisha (Source 4: Wikipedia), and Andhra Pradesh (Source 5: Wikipedia).\n\nRegarding the outcome of the elections, Source 6 (Economic Times) reports that the Congress party made a remarkable comeback, leading the opposition and slowing down the BJP's 10-year-long power trip. However, this claim is not confirmed by other sources and should be treated with caution.\n\nConfirmed facts:\n\n* The 2024 Indian general elections were held in multiple phases between April and June 2024 (Source 2: Wikipedia, Source 4: Wikipedia, Source 5: Wikipedia).\n* The results were announced on June 4 and 5, 2024 (Source 2: Wikipedia).\n* The elections were held to constitute the 18th Lok Sabha, with 543 members to be elected (Source 2: Wikipedia).\n\nUncertain claims:\n\n* The Congress party made a remarkable comeback, leading the opposition and slowing down the BJP's 10-year-long power trip (Source 6: Economic Times). This claim is not confirmed by other sources and should be treated with caution.\n\nSources:\n\n* Source 2: Wikipedia (Results of the 2024 Indian general election)\n* Source 3: Wikipedia (2024 Indian general election in Tamil Nadu)\n* Source 4: Wikipedia (2024 Indian general election in Odisha)\n* Source 5: Wikipedia (2024 Indian general election in Andhra Pradesh)\n* Source 6: Economic Times (Election Results 2024: Latest News, Photos, Videos, Voting ...)"
+  },
+  {
+    "timestamp": "2026-06-03 11:38:18",
+    "query": "present weather in hyderabad",
+    "sub_queries": [
+      "current weather in Hyderabad",
+      "Hyderabad weather today",
+      "present weather conditions in Hyderabad"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://www.ndtv.com/weather/hyderabad-weather-forecast-today",
+      "https://mausam.imd.gov.in/hyderabad/",
+      "https://www.indiatoday.in/weather/hyderabad-weather-forecast-today"
+    ],
+    "summary": "**Current Weather in Hyderabad**\n\nAccording to various sources, including NDTV (Source 1), India Today (Source 3), and AccuWeather (Source 8), the current weather in Hyderabad is expected to be warm with temperatures ranging from 28\u00b0C to 38\u00b0C.\n\n**Confirmed Facts:**\n\n* Minimum temperature: 28\u00b0C (Source 1) to 30\u00b0C (Source 3)\n* Maximum temperature: 36\u00b0C (Source 3) to 38\u00b0C (Source 1)\n* Humidity may make the temperature feel like 38\u00b0C (Source 1)\n\n**Uncertain Claims:**\n\n* Some sources mention variable weather with showers and overcast conditions transitioning into mostly cloudy skies (Source 9), but this is not consistently reported across all sources.\n* India Meteorological Department (Source 2) provides radar animation, weather reports, and rainfall data, but does not provide a clear forecast for the current day.\n\n**Sources:**\n\n* NDTV (Source 1): https://www.ndtv.com/weather/hyderabad-weather-forecast-today\n* India Today (Source 3): https://www.indiatoday.in/weather/hyderabad-weather-forecast-today\n* AccuWeather (Source 8): https://www.accuweather.com/en/in/hyderabad/202190/weather-forecast/202190\n* India Meteorological Department (Source 2): https://mausam.imd.gov.in/hyderabad/\n\nNote: The information provided is based on the available sources and may not reflect the current weather conditions in real-time. For the most up-to-date and accurate weather forecast, it is recommended to check with a reliable weather service or the India Meteorological Department."
+  },
+  {
+    "timestamp": "2026-06-03 11:42:53",
+    "query": "present weather in hyderabad",
+    "sub_queries": [
+      "Hyderabad current weather",
+      "Present weather conditions in Hyderabad",
+      "Current temperature in Hyderabad"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://www.ndtv.com/weather/hyderabad-weather-forecast-today",
+      "https://meteologix.com/in/weather/1269843-hyderabad",
+      "https://www.hyderabadzone.com/news/today-weather-in-hyderabad.html"
+    ],
+    "summary": "The current weather in Hyderabad is partly cloudy with a temperature of 27\u00b0C, expected to rise to 39\u00b0C with thunder and lightning likely. According to NDTV, the weather forecast indicates variable conditions with showers and overcast skies transitioning into mostly cloudy skies. Temperatures are expected to rise steadily in the coming days, with some sources indicating a possible high of 40\u00b0C. Currently, the weather is mild with humidity levels dropping in the evening."
+  },
+  {
+    "timestamp": "2026-06-03 11:43:30",
+    "query": "who is the CM of Telangana",
+    "sub_queries": [
+      "Telangana current Chief Minister",
+      "CM of Telangana 2024",
+      "Who is the Chief Minister of Telangana"
+    ],
+    "result_count": 11,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Revanth_Reddy",
+      "https://en.wikipedia.org/wiki/Chief_Minister_of_Telangana",
+      "https://en.wikipedia.org/wiki/Government_of_Telangana"
+    ],
+    "summary": "The current Chief Minister of Telangana is Anumula Revanth Reddy. He took office on 7 December 2023, as mentioned in Source 3: Government of Telangana. Revanth Reddy is also the minister for Municipal Administration and Urban Development, General Administration, and Law & Order. He is the second Chief Minister of Telangana, succeeding Kalvakuntla Chandrashekar Rao."
+  },
+  {
+    "timestamp": "2026-06-03 11:44:40",
+    "query": "USD to INR exchange rate today",
+    "sub_queries": [
+      "USD to INR exchange rate",
+      "USD vs INR today",
+      "Current USD to INR conversion rate"
+    ],
+    "result_count": 12,
+    "top_sources": [
+      "https://www.xe.com/currencyconverter/convert/?Amount=1",
+      "https://www.westernunion.com/us/en/currency-converter/usd-to-inr-rate.html",
+      "https://wise.com/in/currency-converter/usd-to-inr-rate?amount=1"
+    ],
+    "summary": "The current USD to INR exchange rate is approximately 1 USD = \u20b995.5338, according to Xe. This rate is subject to fluctuation and may vary depending on the source and market conditions. Western Union estimates a slightly lower rate of 1 USD = \u20b994.4607. For the most up-to-date rate, it's best to check a reliable currency converter like Xe or Western Union."
+  },
+  {
+    "timestamp": "2026-06-03 11:48:17",
+    "query": "who is PM of India",
+    "sub_queries": [
+      "Current Prime Minister of India",
+      "Prime Minister of India now",
+      "India PM name"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Narendra_Modi",
+      "https://en.wikipedia.org/wiki/Prime_Minister_of_India_House",
+      "https://en.wikipedia.org/wiki/Prime_Minister_of_India"
+    ],
+    "summary": "Narendra Modi is the Prime Minister of India. He has been in office since 2014, as stated on the official website of the Prime Minister of India. According to Wikipedia and other sources, he is the 14th Prime Minister of India, serving his third consecutive term."
+  },
+  {
+    "timestamp": "2026-06-03 18:18:08",
+    "query": "what is the time at london right now",
+    "sub_queries": [
+      "current time in London",
+      "London time now",
+      "what is the current time in London"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Time_in_the_United_Kingdom",
+      "https://www.timeinlondon.co.uk/",
+      "https://www.timeanddate.com/worldclock/uk/london"
+    ],
+    "summary": "The current time in London is 14:38 BST. This is according to Source 4, which provides a live clock with seconds, sunrise/sunset, timezone info, and daylight-saving status. London is currently observing British Summer Time (BST), which is UTC+01:00. For the most up-to-date information, you can check a live clock or time conversion website."
+  }
+]

@@ -1,0 +1,6 @@
+.env 
+__pycache__/ 
+memory/chroma_store/ 
+memory/sessions/ 
+uploads/ 
+*.pyc 

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Autonomous AI Agent</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="agent-title">AUTONOMOUS AI AGENT</span>
+    <span class="session-id" id="sessionId">Session: —</span>
+  </div>
+  <div class="header-right">
+    <span class="token-counter">Tokens: <strong id="tokenCount">0</strong></span>
+    <span class="turn-counter">Turns: <strong id="turnCount">0</strong></span>
+  </div>
+</header>
+
+<main>
+
+ <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+
+    <section class="panel session-panel">
+      <div class="session-panel-header">
+        <h3>Conversations</h3>
+        <button class="btn-new-chat" onclick="newSession()">+ New Chat</button>
+      </div>
+      <div id="sessionList" class="session-list"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Memory</h3>
+      <div class="stat-row"><span>Short Term</span><span id="shortTerm">—</span></div>
+      <div class="stat-row"><span>Long Term</span><span id="longTerm">—</span></div>
+      <div class="stat-row"><span>Memory Hits</span><span id="memoryHits">0</span></div>
+      <button class="btn-danger" onclick="clearMemory()">Clear Memory</button>
+    </section>
+
+    <section class="panel">
+      <h3>Tools</h3>
+      <div id="toolList" class="tool-list"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Session Stats</h3>
+      <div class="stat-row"><span>Tool Calls</span><span id="toolCalls">0</span></div>
+      <div class="stat-row"><span>Searches</span><span id="searches">0</span></div>
+      <div class="stat-row"><span>Intent Breakdown</span></div>
+      <div id="intentBreakdown" class="intent-grid"></div>
+    </section>
+
+  </aside>
+
+  <!-- CHAT PANEL -->
+  <section class="chat-panel">
+    <div class="chat-history" id="chatHistory"></div>
+    <div class="typing-indicator" id="typingIndicator">
+      <span></span><span></span><span></span>
+    </div>
+    
+    <div class="chat-input-row-container">
+      <div id="filePreview" class="file-preview-bar" style="display: none;">
+        <span class="file-preview-name" id="previewFileName"></span>
+        <button class="file-preview-remove" onclick="clearSelectedFile()">&#x2715;</button>
+      </div>
+      
+      <div class="chat-input-wrapper-box">
+        <input type="file" id="fileUploadInput" style="display: none;" onchange="handleFileSelect()" />
+        
+        <button class="btn-attach-inside" onclick="document.getElementById('fileUploadInput').click()" title="Upload file">+</button>
+        
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Ask anything or discuss attached file..."
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter') sendMessage()"
+        />
+        
+        <button class="btn-send-inside" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+
+    <section class="panel">
+      <h3>Search History</h3>
+      <div id="searchHistory" class="scroll-list"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Calendar</h3>
+      <div id="calendarEvents" class="scroll-list"></div>
+      <div class="calendar-form">
+        <input type="text" id="evtTitle" placeholder="Event title" />
+        <input type="date" id="evtDate" />
+        <input type="time" id="evtTime" />
+        <input type="text" id="evtDesc" placeholder="Description (optional)" />
+        <button class="btn-primary" onclick="addEvent()">Add Event</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Actions</h3>
+      <button class="btn-primary full-width" onclick="exportSession()">Export Session</button>
+    </section>
+
+  </aside>
+
+</main>
+
+<script src="/static/script.js?v=1.1"></script>
+</body>
+</html>

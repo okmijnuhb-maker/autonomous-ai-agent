@@ -1,0 +1,19 @@
+SESSION EXPORT
+==================================================
+
+Session Summary:
+  Session ID   : 20260603_193358
+  Turns        : 1
+  Tokens used  : 375
+  Tool calls   : 0
+  Searches     : 0
+  Memory hits  : 0
+  Intent breakdown : {'chat': 0, 'tool': 0, 'search': 0, 'memory_recall': 0, 'file_analysis': 1}
+  Avg response times : {'file_analysis': 1.89}
+
+==================================================
+CONVERSATION HISTORY
+==================================================
+Recent conversation:
+  [2026-06-03 19:34:27] USER: PDF_PATH:undefined||||USER_REQUEST:summarize the file
+  [2026-06-03 19:34:27] ASSISTANT: An internal system error occurred processing your file stream data payload: [Errno 2] No such file o
