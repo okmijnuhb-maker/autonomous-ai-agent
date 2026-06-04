@@ -15,5 +15,3 @@ uvicorn
 jinja2
 python-multipart
 pytz
-timezonefinder
-geopy

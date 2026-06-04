@@ -102,61 +102,103 @@ def datetime_tool(query: str) -> str:
     import re
     from datetime import datetime as dt
 
+    TIMEZONE_MAP = {
+        "india": "Asia/Kolkata", "ist": "Asia/Kolkata",
+        "mumbai": "Asia/Kolkata", "delhi": "Asia/Kolkata",
+        "hyderabad": "Asia/Kolkata", "bangalore": "Asia/Kolkata",
+        "chennai": "Asia/Kolkata", "kolkata": "Asia/Kolkata",
+        "pune": "Asia/Kolkata", "ahmedabad": "Asia/Kolkata",
+        "london": "Europe/London", "uk": "Europe/London",
+        "england": "Europe/London", "britain": "Europe/London",
+        "new york": "America/New_York", "usa": "America/New_York",
+        "america": "America/New_York", "washington": "America/New_York",
+        "los angeles": "America/Los_Angeles", "california": "America/Los_Angeles",
+        "chicago": "America/Chicago", "houston": "America/Chicago",
+        "toronto": "America/Toronto", "canada": "America/Toronto",
+        "vancouver": "America/Vancouver",
+        "dubai": "Asia/Dubai", "uae": "Asia/Dubai",
+        "abu dhabi": "Asia/Dubai",
+        "singapore": "Asia/Singapore",
+        "tokyo": "Asia/Tokyo", "japan": "Asia/Tokyo",
+        "osaka": "Asia/Tokyo",
+        "beijing": "Asia/Shanghai", "shanghai": "Asia/Shanghai",
+        "china": "Asia/Shanghai", "hong kong": "Asia/Hong_Kong",
+        "sydney": "Australia/Sydney", "australia": "Australia/Sydney",
+        "melbourne": "Australia/Melbourne",
+        "paris": "Europe/Paris", "france": "Europe/Paris",
+        "germany": "Europe/Berlin", "berlin": "Europe/Berlin",
+        "moscow": "Europe/Moscow", "russia": "Europe/Moscow",
+        "pakistan": "Asia/Karachi", "karachi": "Asia/Karachi",
+        "lahore": "Asia/Karachi",
+        "bangladesh": "Asia/Dhaka", "dhaka": "Asia/Dhaka",
+        "nepal": "Asia/Kathmandu", "kathmandu": "Asia/Kathmandu",
+        "sri lanka": "Asia/Colombo", "colombo": "Asia/Colombo",
+        "malaysia": "Asia/Kuala_Lumpur", "kuala lumpur": "Asia/Kuala_Lumpur",
+        "indonesia": "Asia/Jakarta", "jakarta": "Asia/Jakarta",
+        "thailand": "Asia/Bangkok", "bangkok": "Asia/Bangkok",
+        "vietnam": "Asia/Ho_Chi_Minh", "ho chi minh": "Asia/Ho_Chi_Minh",
+        "philippines": "Asia/Manila", "manila": "Asia/Manila",
+        "south korea": "Asia/Seoul", "seoul": "Asia/Seoul",
+        "egypt": "Africa/Cairo", "cairo": "Africa/Cairo",
+        "nigeria": "Africa/Lagos", "lagos": "Africa/Lagos",
+        "abuja": "Africa/Lagos",
+        "south africa": "Africa/Johannesburg", "johannesburg": "Africa/Johannesburg",
+        "kenya": "Africa/Nairobi", "nairobi": "Africa/Nairobi",
+        "ghana": "Africa/Accra", "accra": "Africa/Accra",
+        "ethiopia": "Africa/Addis_Ababa", "addis ababa": "Africa/Addis_Ababa",
+        "brazil": "America/Sao_Paulo", "sao paulo": "America/Sao_Paulo",
+        "mexico": "America/Mexico_City", "mexico city": "America/Mexico_City",
+        "argentina": "America/Argentina/Buenos_Aires",
+        "buenos aires": "America/Argentina/Buenos_Aires",
+        "colombia": "America/Bogota", "bogota": "America/Bogota",
+        "peru": "America/Lima", "lima": "America/Lima",
+        "chile": "America/Santiago", "santiago": "America/Santiago",
+        "spain": "Europe/Madrid", "madrid": "Europe/Madrid",
+        "italy": "Europe/Rome", "rome": "Europe/Rome",
+        "netherlands": "Europe/Amsterdam", "amsterdam": "Europe/Amsterdam",
+        "switzerland": "Europe/Zurich", "zurich": "Europe/Zurich",
+        "sweden": "Europe/Stockholm", "stockholm": "Europe/Stockholm",
+        "norway": "Europe/Oslo", "oslo": "Europe/Oslo",
+        "denmark": "Europe/Copenhagen", "copenhagen": "Europe/Copenhagen",
+        "finland": "Europe/Helsinki", "helsinki": "Europe/Helsinki",
+        "poland": "Europe/Warsaw", "warsaw": "Europe/Warsaw",
+        "turkey": "Europe/Istanbul", "istanbul": "Europe/Istanbul",
+        "israel": "Asia/Jerusalem", "jerusalem": "Asia/Jerusalem",
+        "saudi arabia": "Asia/Riyadh", "riyadh": "Asia/Riyadh",
+        "qatar": "Asia/Qatar", "doha": "Asia/Qatar",
+        "kuwait": "Asia/Kuwait",
+        "iraq": "Asia/Baghdad", "baghdad": "Asia/Baghdad",
+        "iran": "Asia/Tehran", "tehran": "Asia/Tehran",
+        "afghanistan": "Asia/Kabul", "kabul": "Asia/Kabul",
+        "utc": "UTC", "gmt": "GMT",
+        "new zealand": "Pacific/Auckland", "auckland": "Pacific/Auckland",
+        "hawaii": "Pacific/Honolulu",
+    }
+
     query_lower = query.lower()
 
-    # Extract place name from query
-    patterns = [
-        r'time in (.+)',
-        r'current time in (.+)',
-        r'what time is it in (.+)',
-        r'what is the time in (.+)',
-        r'time at (.+)',
-    ]
+    matched_tz_name = "Asia/Kolkata"
+    matched_place = "India (IST)"
 
-    place = None
-    for pattern in patterns:
-        match = re.search(pattern, query_lower)
-        if match:
-            place = match.group(1).strip().rstrip('?').strip()
+    for place, tz_name in TIMEZONE_MAP.items():
+        if place in query_lower:
+            matched_tz_name = tz_name
+            matched_place = place.title()
             break
 
-    # If no place found default to IST
-    if not place or place in ['india', 'ist', '']:
-        tz = pytz.timezone("Asia/Kolkata")
-        now = dt.now(tz)
-        return f"Current time in India (IST): {now.strftime('%H:%M:%S %Z')}"
-
-    # Look up timezone for any city in the world
     try:
-        from geopy.geocoders import Nominatim
-        from timezonefinder import TimezoneFinder
-
-        geolocator = Nominatim(user_agent="autonomous_agent")
-        location = geolocator.geocode(place, timeout=5)
-
-        if not location:
-            return f"Could not find location: {place}"
-
-        tf = TimezoneFinder()
-        tz_name = tf.timezone_at(lat=location.latitude, lng=location.longitude)
-
-        if not tz_name:
-            return f"Could not determine timezone for: {place}"
-
-        tz = pytz.timezone(tz_name)
+        tz = pytz.timezone(matched_tz_name)
         now = dt.now(tz)
-
-        if "time" in query_lower:
-            return f"Current time in {place.title()}: {now.strftime('%H:%M:%S %Z')}"
-        if "day" in query_lower:
-            return f"Today in {place.title()}: {now.strftime('%A, %Y-%m-%d')}"
-        return f"Current datetime in {place.title()}: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}"
-
-    except Exception as e:
-        log.warning(f"Timezone lookup failed: {e}")
+    except Exception:
         tz = pytz.timezone("Asia/Kolkata")
         now = dt.now(tz)
-        return f"Current time in India (IST): {now.strftime('%H:%M:%S %Z')}"
+        matched_place = "India (IST)"
+
+    if "time" in query_lower or "what time" in query_lower:
+        return f"Current time in {matched_place}: {now.strftime('%H:%M:%S %Z')}"
+    if "day" in query_lower:
+        return f"Today in {matched_place}: {now.strftime('%A, %Y-%m-%d')}"
+    return f"Current datetime in {matched_place}: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}"
 
 def unit_converter(query: str) -> str:
     try:
