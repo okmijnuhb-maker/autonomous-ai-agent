@@ -18,55 +18,50 @@ def classify_intent(
     client,
     cfg: AgentConfig
 ) -> Tuple[str, Optional[str]]:
-    # Force direct file analysis routing if browser-attached context markers are found
-    if "[ATTACHED FILE CONTEXT:" in user_input:
-        log.info("Direct file text markers intercepted — bypassing classifier routing")
-        return "file_analysis", None
-
-  prompt = (
-    "You are an intent classifier for an AI agent.\n\n"
-    "Classify the user input into exactly one intent.\n\n"
-    "Rules:\n"
-    "- chat: greetings, general knowledge, explanations, opinions, how things work\n"
-    "- tool: ANY question about time or date in ANY city or country, weather, math, "
-    "unit conversion, word definitions, system info, wikipedia lookup, file reading, CSV analysis\n"
-    "- search: current news, recent events, who currently holds a position, "
-    "stock prices, sports results, latest developments, anything requiring live internet data\n"
-    "- memory_recall: questions about what was said earlier, user name, past conversation, 'what do you know about me'\n"
-    "- file_analysis: user provides a file path, explicitly references an uploaded or attached file name, "
-    "or asks to read/analyze a document\n\n"
-    "Tool selection rules:\n"
-    "- time or date in ANY city or country -> datetime_tool\n"
-    "- weather questions -> weather\n"
-    "- math expressions -> calculator\n"
-    "- unit conversion -> unit_converter\n"
-    "- word definitions -> dictionary\n"
-    "- wikipedia questions -> wikipedia\n"
-    "- system info -> system_info\n"
-    "- CSV file analysis -> csv_analyzer\n"
-    "- file reading -> file_reader\n\n"
-    "Examples:\n"
-    "- 'what is 25 * 48' -> tool, calculator\n"
-    "- 'what time is it' -> tool, datetime_tool\n"
-    "- 'time in india' -> tool, datetime_tool\n"
-    "- 'time in london' -> tool, datetime_tool\n"
-    "- 'time in tokyo' -> tool, datetime_tool\n"
-    "- 'time in usa' -> tool, datetime_tool\n"
-    "- 'time in any city or country' -> tool, datetime_tool\n"
-    "- 'weather in Hyderabad' -> tool, weather\n"
-    "- 'define cognition' -> tool, dictionary\n"
-    "- 'who is the PM of India' -> search\n"
-    "- 'latest AI news' -> search\n"
-    "- 'who won IPL 2025' -> search\n"
-    "- 'what is machine learning' -> chat\n"
-    "- 'how does photosynthesis work' -> chat\n"
-    "- 'what is my name' -> memory_recall\n"
-    "- 'read file C:/path/file.txt' -> file_analysis\n"
-    "- 'analyze this CSV C:/path/file.csv' -> tool, csv_analyzer\n"
-    "- 'analyze CSV C:/path/file.csv' -> tool, csv_analyzer\n\n"
-    "Reply ONLY with JSON: {\"intent\": \"...\", \"tool\": \"...or null\"}\n"
-    "Input: " + user_input
-)
+    prompt = (
+        "You are an intent classifier for an AI agent.\n\n"
+        "Classify the user input into exactly one intent.\n\n"
+        "Rules:\n"
+        "- chat: greetings, general knowledge, explanations, opinions, how things work\n"
+        "- tool: ANY question about time or date in ANY city or country, weather, math, "
+        "unit conversion, word definitions, system info, wikipedia lookup, file reading, CSV analysis\n"
+        "- search: current news, recent events, who currently holds a position, "
+        "stock prices, sports results, latest developments, anything requiring live internet data\n"
+        "- memory_recall: questions about what was said earlier, user name, past conversation, 'what do you know about me'\n"
+        "- file_analysis: user provides a file path, explicitly references an uploaded or attached file name, "
+        "or asks to read/analyze a document\n\n"
+        "Tool selection rules:\n"
+        "- time or date in ANY city or country -> datetime_tool\n"
+        "- weather questions -> weather\n"
+        "- math expressions -> calculator\n"
+        "- unit conversion -> unit_converter\n"
+        "- word definitions -> dictionary\n"
+        "- wikipedia questions -> wikipedia\n"
+        "- system info -> system_info\n"
+        "- CSV file analysis -> csv_analyzer\n"
+        "- file reading -> file_reader\n\n"
+        "Examples:\n"
+        "- 'what is 25 * 48' -> tool, calculator\n"
+        "- 'what time is it' -> tool, datetime_tool\n"
+        "- 'time in india' -> tool, datetime_tool\n"
+        "- 'time in london' -> tool, datetime_tool\n"
+        "- 'time in tokyo' -> tool, datetime_tool\n"
+        "- 'time in usa' -> tool, datetime_tool\n"
+        "- 'time in any city or country' -> tool, datetime_tool\n"
+        "- 'weather in Hyderabad' -> tool, weather\n"
+        "- 'define cognition' -> tool, dictionary\n"
+        "- 'who is the PM of India' -> search\n"
+        "- 'latest AI news' -> search\n"
+        "- 'who won IPL 2025' -> search\n"
+        "- 'what is machine learning' -> chat\n"
+        "- 'how does photosynthesis work' -> chat\n"
+        "- 'what is my name' -> memory_recall\n"
+        "- 'read file C:/path/file.txt' -> file_analysis\n"
+        "- 'analyze this CSV C:/path/file.csv' -> tool, csv_analyzer\n"
+        "- 'analyze CSV C:/path/file.csv' -> tool, csv_analyzer\n\n"
+        "Reply ONLY with JSON: {\"intent\": \"...\", \"tool\": \"...or null\"}\n"
+        "Input: " + user_input
+    )
     try:
         response = client.chat.completions.create(
             model=cfg.model,
@@ -84,7 +79,6 @@ def classify_intent(
     except Exception as e:
         log.warning(f"Intent classification failed: {e} — defaulting to chat")
         return "chat", None
-
 
 def handle_memory_recall(
     user_input: str,
