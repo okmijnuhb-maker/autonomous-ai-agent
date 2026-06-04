@@ -98,12 +98,65 @@ def file_reader(filepath: str) -> str:
         return f"File reader error: {e}"
 
 def datetime_tool(query: str) -> str:
-    now = datetime.now()
-    if "time" in query.lower():
-        return f"Current local system time: {now.strftime('%H:%M:%S')} (This is the local time on the machine running this agent, not a specific city time)"
-    if "day" in query.lower():
-        return f"Today is: {now.strftime('%A, %Y-%m-%d')}"
-    return f"Current local datetime: {now.strftime('%Y-%m-%d %H:%M:%S')} (local machine time)"
+    import pytz
+    import re
+    from datetime import datetime as dt
+
+    query_lower = query.lower()
+
+    # Extract place name from query
+    patterns = [
+        r'time in (.+)',
+        r'current time in (.+)',
+        r'what time is it in (.+)',
+        r'what is the time in (.+)',
+        r'time at (.+)',
+    ]
+
+    place = None
+    for pattern in patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            place = match.group(1).strip().rstrip('?').strip()
+            break
+
+    # If no place found default to IST
+    if not place or place in ['india', 'ist', '']:
+        tz = pytz.timezone("Asia/Kolkata")
+        now = dt.now(tz)
+        return f"Current time in India (IST): {now.strftime('%H:%M:%S %Z')}"
+
+    # Look up timezone for any city in the world
+    try:
+        from geopy.geocoders import Nominatim
+        from timezonefinder import TimezoneFinder
+
+        geolocator = Nominatim(user_agent="autonomous_agent")
+        location = geolocator.geocode(place, timeout=5)
+
+        if not location:
+            return f"Could not find location: {place}"
+
+        tf = TimezoneFinder()
+        tz_name = tf.timezone_at(lat=location.latitude, lng=location.longitude)
+
+        if not tz_name:
+            return f"Could not determine timezone for: {place}"
+
+        tz = pytz.timezone(tz_name)
+        now = dt.now(tz)
+
+        if "time" in query_lower:
+            return f"Current time in {place.title()}: {now.strftime('%H:%M:%S %Z')}"
+        if "day" in query_lower:
+            return f"Today in {place.title()}: {now.strftime('%A, %Y-%m-%d')}"
+        return f"Current datetime in {place.title()}: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}"
+
+    except Exception as e:
+        log.warning(f"Timezone lookup failed: {e}")
+        tz = pytz.timezone("Asia/Kolkata")
+        now = dt.now(tz)
+        return f"Current time in India (IST): {now.strftime('%H:%M:%S %Z')}"
 
 def unit_converter(query: str) -> str:
     try:

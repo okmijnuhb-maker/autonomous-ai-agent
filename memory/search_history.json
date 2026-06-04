@@ -254,5 +254,21 @@
       "https://weather.yahoo.com/gb/england/london/"
     ],
     "summary": "The current weather in London is partly cloudy with a high of 65\u00b0F and a low of 52\u00b0F, and there is a 63% chance of precipitation. According to Yahoo Weather, the RealFeel temperature is 50\u00b0. Temperatures in London can vary, but summer averages are around 18C (64F), as noted by Visit London. For the most up-to-date forecast, it's best to check a reliable weather source like the Met Office or BBC Weather."
+  },
+  {
+    "timestamp": "2026-06-04 11:41:12",
+    "query": "what time in london",
+    "sub_queries": [
+      "current time in London",
+      "London time zone",
+      "what is the current time in London UK"
+    ],
+    "result_count": 9,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/Time_in_the_United_Kingdom",
+      "https://en.wikipedia.org/wiki/Greenwich_Mean_Time",
+      "https://time.now/countries/united-kingdom/"
+    ],
+    "summary": "The current time in London is 03:10 BST. London switches between GMT in winter and BST in summer, with a one-hour shift. According to time.now, this information is updated every second, providing the most accurate and current time."
   }
 ]
