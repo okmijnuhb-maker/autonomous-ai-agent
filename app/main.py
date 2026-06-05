@@ -201,20 +201,55 @@ def datetime_tool(query: str) -> str:
     return f"Current datetime in {matched_place}: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}"
 
 def unit_converter(query: str) -> str:
+    import re
     try:
-        parts = query.lower().split()
-        value, unit_from, unit_to = float(parts[0]), parts[1], parts[3]
+        pattern = re.search(
+            r'([\d.]+)\s*([a-zA-Z]+)\s+(?:to|in|into)\s+([a-zA-Z]+)',
+            query.lower()
+        )
+        if not pattern:
+            return f"Could not parse conversion request. Use format: '100 km to miles'"
+
+        value = float(pattern.group(1))
+        unit_from = pattern.group(2).strip()
+        unit_to = pattern.group(3).strip()
+
         conversions = {
-            ("kg","lbs"): lambda x: x*2.20462, ("lbs","kg"): lambda x: x/2.20462,
-            ("km","miles"): lambda x: x*0.621371, ("miles","km"): lambda x: x/0.621371,
-            ("celsius","fahrenheit"): lambda x: x*9/5+32,
-            ("fahrenheit","celsius"): lambda x: (x-32)*5/9,
-            ("meters","feet"): lambda x: x*3.28084, ("feet","meters"): lambda x: x/3.28084,
+            ("kg", "lbs"): lambda x: x * 2.20462,
+            ("lbs", "kg"): lambda x: x / 2.20462,
+            ("km", "miles"): lambda x: x * 0.621371,
+            ("miles", "km"): lambda x: x / 0.621371,
+            ("kilometers", "miles"): lambda x: x * 0.621371,
+            ("miles", "kilometers"): lambda x: x / 0.621371,
+            ("celsius", "fahrenheit"): lambda x: x * 9/5 + 32,
+            ("fahrenheit", "celsius"): lambda x: (x - 32) * 5/9,
+            ("meters", "feet"): lambda x: x * 3.28084,
+            ("feet", "meters"): lambda x: x / 3.28084,
+            ("meters", "kilometers"): lambda x: x / 1000,
+            ("kilometers", "meters"): lambda x: x * 1000,
+            ("grams", "kg"): lambda x: x / 1000,
+            ("kg", "grams"): lambda x: x * 1000,
+            ("liters", "gallons"): lambda x: x * 0.264172,
+            ("gallons", "liters"): lambda x: x / 0.264172,
+            ("inches", "cm"): lambda x: x * 2.54,
+            ("cm", "inches"): lambda x: x / 2.54,
+            ("miles", "meters"): lambda x: x * 1609.34,
+            ("meters", "miles"): lambda x: x / 1609.34,
+            ("pounds", "kg"): lambda x: x / 2.20462,
+            ("kg", "pounds"): lambda x: x * 2.20462,
+            ("mb", "gb"): lambda x: x / 1024,
+            ("gb", "mb"): lambda x: x * 1024,
+            ("gb", "tb"): lambda x: x / 1024,
+            ("tb", "gb"): lambda x: x * 1024,
         }
+
         key = (unit_from, unit_to)
         if key not in conversions:
-            return f"Conversion {unit_from} to {unit_to} not supported."
-        return f"{value} {unit_from} = {round(conversions[key](value), 4)} {unit_to}"
+            return f"Conversion from {unit_from} to {unit_to} not supported."
+
+        result = conversions[key](value)
+        return f"{value} {unit_from} = {round(result, 4)} {unit_to}"
+
     except Exception as e:
         return f"Unit converter error: {e}"
 
