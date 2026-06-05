@@ -22,7 +22,7 @@ EXPORT_PATH = f"{BASE_PATH}/memory/session_export.txt"
 
 # model constants
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
-DEFAULT_MAX_TOKENS = 2048
+DEFAULT_MAX_TOKENS = 1024
 DEFAULT_TEMPERATURE = 0.3
 SHORT_TERM_LIMIT = 10
 MEMORY_RESULTS = 3
