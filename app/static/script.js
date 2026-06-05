@@ -182,7 +182,7 @@ function chipSend(text) {
 }
 
 // ============================================================
-// SEND MESSAGE
+// SEND MESSAGE (UPDATED DIRECT FILE STREAM Interceptor)
 // ============================================================
 async function sendMessage() {
   const input = document.getElementById('chatInput');
@@ -195,7 +195,6 @@ async function sendMessage() {
   if (selectedFileObject) {
     try {
       const fileName = selectedFileObject.name.toLowerCase();
-      
       if (fileName.endsWith('.pdf')) {
         const formData = new FormData();
         formData.append("file", selectedFileObject);
@@ -203,22 +202,11 @@ async function sendMessage() {
         const uploadRes = await fetch(`${API}/upload`, { method: "POST", body: formData });
         const uploadData = await uploadRes.json();
         finalPayloadMessage = `PDF_PATH:${uploadData.absolute_path}||||USER_REQUEST:${message || "Summarize this file"}`;
-      
-      } else if (fileName.endsWith('.csv')) {
-        const formData = new FormData();
-        formData.append("file", selectedFileObject);
-        const uploadRes = await fetch(`${API}/upload`, { method: "POST", body: formData });
-        const uploadData = await uploadRes.json();
-        finalPayloadMessage = `analyze this CSV ${uploadData.absolute_path}`;
-      
       } else {
-        const formData = new FormData();
-        formData.append("file", selectedFileObject);
-        const uploadRes = await fetch(`${API}/upload`, { method: "POST", body: formData });
-        const uploadData = await uploadRes.json();
-        finalPayloadMessage = `read this file ${uploadData.absolute_path}`;
+        // Read file content directly in browser
+        const fileText = await selectedFileObject.text();
+        finalPayloadMessage = `[FILE_NAME:${selectedFileObject.name}]\n[FILE_CONTENT_START]\n${fileText}\n[FILE_CONTENT_END]\n\nUser Request: ${message || "Analyze this file"}`;
       }
-
     } catch (err) {
       console.error("File extraction failed:", err);
     }
@@ -289,24 +277,17 @@ function appendMessage(role, text, intent, tool, elapsed) {
   if (role === 'agent' && intent) {
     const meta = document.createElement('div');
     meta.className = 'message-meta';
-
+    
     const badge = document.createElement('span');
     badge.className = `intent-badge badge-${intent}`;
     badge.textContent = badgeLabel(intent, tool);
     meta.appendChild(badge);
-
+    
     if (elapsed !== null) {
       const time = document.createElement('span');
       time.textContent = `${elapsed}s`;
       meta.appendChild(time);
     }
-
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-btn';
-    copyBtn.textContent = 'Copy';
-    copyBtn.onclick = () => copyMessage(copyBtn, text);
-    meta.appendChild(copyBtn);
-
     msg.appendChild(meta);
   }
   
@@ -592,11 +573,13 @@ function toggleTheme() {
   }
 }
 
+// Added baseline theme verification bootstrap hook
 function loadTheme() {
   const saved = localStorage.getItem('theme');
   if (saved === 'dark') {
     document.body.classList.add('dark');
-    document.getElementById('themeToggle').textContent = 'Light Mode';
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = 'Light Mode';
   }
 }
 
@@ -644,14 +627,18 @@ function startVoice() {
   recognition.onstart = () => {
     isListening = true;
     const micBtn = document.getElementById('micBtn');
-    micBtn.classList.add('listening');
-    micBtn.textContent = '⏹';
-    document.getElementById('chatInput').placeholder = 'Listening...';
+    if (micBtn) {
+      micBtn.classList.add('listening');
+      micBtn.textContent = '⏹';
+    }
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) chatInput.placeholder = 'Listening...';
   };
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    document.getElementById('chatInput').value = transcript;
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) chatInput.value = transcript;
     stopVoice();
     sendMessage();
   };
@@ -676,9 +663,7 @@ function stopVoice() {
     micBtn.textContent = '🎤';
   }
   const chatInput = document.getElementById('chatInput');
-  if (chatInput) {
-    chatInput.placeholder = 'Ask anything...';
-  }
+  if (chatInput) chatInput.placeholder = 'Ask anything...';
   if (recognition) {
     recognition.stop();
     recognition = null;
