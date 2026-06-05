@@ -17,24 +17,40 @@ def classify_intent(
     client,
     cfg: AgentConfig
 ) -> Tuple[str, Optional[str]]:
-    # Force direct file analysis routing if browser-attached context markers are found
     if "[ATTACHED FILE CONTEXT:" in user_input or "[FILE_CONTENT_START]" in user_input:
         log.info("Direct file text markers intercepted — bypassing classifier routing")
         return "file_analysis", None
 
     prompt = (
+        "You are an intent classifier for an AI agent.\n\n"
         "Classify the user input into exactly one intent.\n\n"
         "Rules:\n"
         "- chat: greetings, general knowledge, explanations, opinions, how things work\n"
-        "- tool: math calculations, current time/date, weather, unit conversion, word definitions, system info, wikipedia lookup, file reading\n"
-        "- search: current events, news, recent developments, who currently holds a position, prices today, sports results, anything that changes frequently and needs live data\n"
-        "- memory_recall: questions about what was said earlier, user's name, past conversation, 'what do you know about me'\n"
-        "- file_analysis: user provides a file path, explicitly references an uploaded or attached file name, or asks to read/analyze a document data structure\n\n"
+        "- tool: ANY question about time or date in ANY city or country, weather, math, "
+        "unit conversion, word definitions, system info, wikipedia lookup, file reading, CSV analysis\n"
+        "- search: current news, recent events, who currently holds a position, "
+        "stock prices, sports results, latest developments, anything requiring live internet data\n"
+        "- memory_recall: questions about what was said earlier, user name, past conversation, 'what do you know about me'\n"
+        "- file_analysis: user provides a file path, explicitly references an uploaded or attached file name, "
+        "or asks to read/analyze a document\n\n"
+        "Tool selection rules:\n"
+        "- time or date in ANY city or country -> datetime_tool\n"
+        "- weather questions -> weather\n"
+        "- math expressions -> calculator\n"
+        "- unit conversion -> unit_converter\n"
+        "- word definitions -> dictionary\n"
+        "- wikipedia questions -> wikipedia\n"
+        "- system info -> system_info\n"
+        "- CSV file analysis -> csv_analyzer\n"
+        "- file reading -> file_reader\n\n"
         "Examples:\n"
         "- 'what is 25 * 48' -> tool, calculator\n"
         "- 'what time is it' -> tool, datetime_tool\n"
-        "- 'what time is it in London' -> search\n"
-        "- 'current time in Tokyo' -> search\n"
+        "- 'time in india' -> tool, datetime_tool\n"
+        "- 'time in london' -> tool, datetime_tool\n"
+        "- 'time in tokyo' -> tool, datetime_tool\n"
+        "- 'time in usa' -> tool, datetime_tool\n"
+        "- 'time in any city or country' -> tool, datetime_tool\n"
         "- 'weather in Hyderabad' -> tool, weather\n"
         "- 'define cognition' -> tool, dictionary\n"
         "- 'who is the PM of India' -> search\n"
@@ -43,7 +59,9 @@ def classify_intent(
         "- 'what is machine learning' -> chat\n"
         "- 'how does photosynthesis work' -> chat\n"
         "- 'what is my name' -> memory_recall\n"
-        "- 'read file C:/path/file.txt' -> file_analysis\n\n"
+        "- 'read file C:/path/file.txt' -> file_analysis\n"
+        "- 'analyze this CSV C:/path/file.csv' -> tool, csv_analyzer\n"
+        "- 'analyze CSV C:/path/file.csv' -> tool, csv_analyzer\n\n"
         "Reply ONLY with JSON: {\"intent\": \"...\", \"tool\": \"...or null\"}\n"
         "Input: " + user_input
     )
@@ -65,6 +83,7 @@ def classify_intent(
         log.warning(f"Intent classification failed: {e} — defaulting to chat")
         return "chat", None
 
+
 def handle_memory_recall(
     user_input: str,
     long_term: LongTermMemory,
@@ -78,11 +97,12 @@ def handle_memory_recall(
     context = "Relevant memory:\n" + "\n---\n".join(retrieved)
     augmented_system = cfg.system_prompt + f"\n\n{context}"
     messages = [{"role": "system", "content": augmented_system}]
-    messages += short_term.get()
+    messages += short_term.get_recent(4)
     messages.append({"role": "user", "content": user_input})
     cfg.memory_hits += 1
     log.info(f"Memory hit #{cfg.memory_hits}")
     return _call_llm(messages, client, cfg)
+
 
 def handle_tool(
     user_input: str,
@@ -110,6 +130,7 @@ def handle_tool(
         log.error(f"Tool handler failed: {e}")
         return handle_chat(user_input, short_term, client, cfg)
 
+
 def handle_search(
     user_input: str,
     search_history: SearchHistoryManager,
@@ -131,6 +152,7 @@ def handle_search(
         log.error(f"Search handler failed: {e}")
         return f"Search failed: {e}"
 
+
 def handle_file_analysis(
     user_input: str,
     short_term: ShortTermBuffer,
@@ -144,12 +166,10 @@ def handle_file_analysis(
             file_name = ""
             if "[FILE_NAME:" in user_input:
                 file_name = user_input.split("[FILE_NAME:")[1].split("]")[0]
-            
             content = user_input.split("[FILE_CONTENT_START]")[1].split("[FILE_CONTENT_END]")[0].strip()
             user_request = user_input.split("[FILE_CONTENT_END]")[1].strip()
             if user_request.startswith("User Request:"):
                 user_request = user_request.replace("User Request:", "").strip()
-            
             messages = [
                 {"role": "system", "content": cfg.system_prompt},
                 {"role": "user", "content": f"File name: {file_name}\n\nFile content:\n{content[:12000]}\n\nInstruction: {user_request}"}
@@ -159,39 +179,33 @@ def handle_file_analysis(
             log.error(f"Direct content processing failed: {e}")
             return handle_chat(user_input, short_term, client, cfg)
 
-    # Scenario B: PDF explicit binary data stream handler (via pdfplumber)
+    # Scenario B: PDF binary stream handler
     if "PDF_PATH:" in user_input and "||||" in user_input:
-        log.info("Processing absolute internal server PDF file parsing token marker target")
+        log.info("Processing PDF file")
         try:
             parts = user_input.split("||||")
             filepath = parts[0].replace("PDF_PATH:", "").strip()
             user_instruction = parts[1].replace("USER_REQUEST:", "").strip()
-            
             import pdfplumber
-            log.info(f"Extracting text via pdfplumber: {filepath}")
             extracted_pages = []
             with pdfplumber.open(filepath) as pdf:
                 for page in pdf.pages:
                     page_text = page.extract_text()
                     if page_text:
                         extracted_pages.append(page_text)
-            file_content = "\n".join(extracted_pages).strip()
-            file_content = file_content[:12000]
-            
+            file_content = "\n".join(extracted_pages).strip()[:12000]
             if not file_content:
-                return "The system successfully uploaded your PDF, but no plain text information could be read. Ensure it is not an image-only scanned document."
-
+                return "The PDF was uploaded successfully but no text could be extracted. It may be image-based."
             messages = [
                 {"role": "system", "content": cfg.system_prompt},
-                {"role": "user", "content": f"Document context data extracted from upload file:\n\n{file_content}\n\nUser Question/Instruction: {user_instruction}"}
+                {"role": "user", "content": f"Document content:\n\n{file_content}\n\nInstruction: {user_instruction}"}
             ]
             return _call_llm(messages, client, cfg)
-            
-        except Exception as upload_read_err:
-            log.error(f"Internal file loader pipeline execution crash: {upload_read_err}")
-            return f"An internal system error occurred processing your file stream data payload: {str(upload_read_err)}"
+        except Exception as e:
+            log.error(f"PDF processing error: {e}")
+            return f"Error processing PDF: {str(e)}"
 
-    # Scenario C: Shorthand text path strings fallback
+    # Scenario C: File path fallback
     words = user_input.replace(",", " ").split()
     filepath = None
     for word in words:
@@ -202,16 +216,17 @@ def handle_file_analysis(
 
     if not filepath:
         return handle_chat(user_input, short_term, client, cfg)
-        
+
     try:
         file_content = read_file(filepath)
         messages = [
             {"role": "system", "content": cfg.system_prompt},
-            {"role": "user", "content": f"File content from local directory path:\n\n{file_content}\n\nRequest: {user_input}"}
+            {"role": "user", "content": f"File content:\n\n{file_content}\n\nRequest: {user_input}"}
         ]
         return _call_llm(messages, client, cfg)
     except Exception as e:
-        return f"Could not read the file signature provided: {str(e)}"
+        return f"Could not read the file: {str(e)}"
+
 
 def handle_chat(
     user_input: str,
@@ -220,9 +235,10 @@ def handle_chat(
     cfg: AgentConfig
 ) -> str:
     messages = [{"role": "system", "content": cfg.system_prompt}]
-    messages += short_term.get()
+    messages += short_term.get_recent(6)
     messages.append({"role": "user", "content": user_input})
     return _call_llm(messages, client, cfg)
+
 
 def _call_llm(messages: list, client, cfg: AgentConfig) -> str:
     for attempt in range(MAX_RETRIES):
@@ -242,6 +258,7 @@ def _call_llm(messages: list, client, cfg: AgentConfig) -> str:
                 time.sleep(RETRY_DELAY)
     log.error("All LLM retry attempts failed")
     return "I was unable to process your request. Please try again."
+
 
 def orchestrate(
     user_input: str,
