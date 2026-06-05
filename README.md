@@ -91,37 +91,6 @@ This agent was built around 3 core capability types:
 
 ---
 
-## Project Structure
-autonomous-ai-agent/
-├── app/
-│   ├── main.py              # FastAPI backend
-│   └── static/
-│       ├── index.html       # Frontend UI
-│       ├── style.css        # Styling
-│       └── script.js        # Frontend logic
-├── agent/
-│   ├── core.py              # Config and constants
-│   ├── orchestrator.py      # Intent classifier and router
-│   └── response_builder.py  # Response formatting
-├── memory/
-│   ├── short_term.py        # Deque buffer
-│   └── long_term.py         # ChromaDB vector store
-├── tools/
-│   ├── web_search.py        # Search pipeline
-│   ├── file_handler.py      # File reader
-│   ├── email_tool.py        # Email sender
-│   └── calendar_tool.py     # Calendar manager
-├── notebooks/
-│   ├── 01_basic_chatbot.ipynb
-│   ├── 02_memory_agent.ipynb
-│   ├── 03_tool_calling.ipynb
-│   ├── 04_web_search_agent.ipynb
-│   └── 05_full_agent.ipynb
-├── requirements.txt
-├── Procfile
-└── README.md
-
----
 
 ## Notebooks
 
