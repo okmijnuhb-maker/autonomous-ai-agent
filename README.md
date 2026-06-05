@@ -60,8 +60,3 @@ http://localhost:8000
 - Calendar management
 - Session export
 
----
-
-## Author
-
-Charan — Capstone Project
