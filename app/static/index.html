@@ -4,7 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Autonomous AI Agent</title>
-<link rel="stylesheet" href="/static/style.css" />
+<link rel="stylesheet" href="/static/style.css?v=1.2" />
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -16,13 +17,13 @@
   <div class="header-right">
     <span class="token-counter">Tokens: <strong id="tokenCount">0</strong></span>
     <span class="turn-counter">Turns: <strong id="turnCount">0</strong></span>
+    <button class="btn-theme-toggle" onclick="toggleTheme()" id="themeToggle">Dark Mode</button>
   </div>
 </header>
 
 <main>
 
- <!-- LEFT SIDEBAR -->
-  <aside class="sidebar-left">
+ <aside class="sidebar-left">
 
     <section class="panel session-panel">
       <div class="session-panel-header">
@@ -55,7 +56,6 @@
 
   </aside>
 
-  <!-- CHAT PANEL -->
   <section class="chat-panel">
     <div class="chat-history" id="chatHistory"></div>
     <div class="typing-indicator" id="typingIndicator">
@@ -73,10 +73,12 @@
         
         <button class="btn-attach-inside" onclick="document.getElementById('fileUploadInput').click()" title="Upload file">+</button>
         
+        <button class="btn-mic" id="micBtn" onclick="toggleVoice()">&#127908;</button>
+        
         <input
           type="text"
           id="chatInput"
-          placeholder="Ask anything or discuss attached file..."
+          placeholder="Ask anything..."
           autocomplete="off"
           onkeydown="if(event.key==='Enter') sendMessage()"
         />
@@ -86,7 +88,6 @@
     </div>
   </section>
 
-  <!-- RIGHT SIDEBAR -->
   <aside class="sidebar-right">
 
     <section class="panel">
@@ -115,6 +116,6 @@
 
 </main>
 
-<script src="/static/script.js?v=1.1"></script>
+<script src="/static/script.js?v=1.2"></script>
 </body>
 </html>

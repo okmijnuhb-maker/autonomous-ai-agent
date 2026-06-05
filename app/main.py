@@ -219,13 +219,27 @@ def unit_converter(query: str) -> str:
         return f"Unit converter error: {e}"
 
 def dictionary_tool(word: str) -> str:
+    import re
+    # Extract just the word from the query
+    clean_word = re.sub(r'(define|the|word|meaning of|what is)\s*', '', word.lower()).strip()
+    clean_word = clean_word.split()[0] if clean_word else word.strip()
+    
     try:
-        r = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}", timeout=5)
+        r = requests.get(
+            f"https://api.dictionaryapi.dev/api/v2/entries/en/{clean_word}",
+            timeout=10
+        )
         data = r.json()
         if isinstance(data, list):
             meaning = data[0]["meanings"][0]
-            return f"{word} ({meaning['partOfSpeech']}): {meaning['definitions'][0]['definition']}"
-        return f"No definition found: {word}"
+            definition = meaning["definitions"][0]["definition"]
+            part_of_speech = meaning["partOfSpeech"]
+            example = meaning["definitions"][0].get("example", "")
+            result = f"{clean_word} ({part_of_speech}): {definition}"
+            if example:
+                result += f"\nExample: {example}"
+            return result
+        return f"No definition found for: {clean_word}"
     except Exception as e:
         return f"Dictionary error: {e}"
 
@@ -359,7 +373,7 @@ async def upload_file(file: UploadFile = FastAPIFile(...)):
         with open(dest, "wb") as f:
             shutil.copyfileobj(file.file, f)
         log.info(f"File uploaded successfully: {dest}")
-        return {"absolute_path": str(dest.resolve()), "filename": file.filename}
+        return {"absolute_path": str(dest.resolve()).replace("\\", "/"), "filename": file.filename}
     except Exception as e:
         log.error(f"Upload processing failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))

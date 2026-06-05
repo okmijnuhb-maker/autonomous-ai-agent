@@ -270,5 +270,21 @@
       "https://time.now/countries/united-kingdom/"
     ],
     "summary": "The current time in London is 03:10 BST. London switches between GMT in winter and BST in summer, with a one-hour shift. According to time.now, this information is updated every second, providing the most accurate and current time."
+  },
+  {
+    "timestamp": "2026-06-05 10:31:06",
+    "query": "who is the current world chess champion 2025",
+    "sub_queries": [
+      "current world chess champion 2025",
+      "world chess champion 2025",
+      "2025 chess world champion"
+    ],
+    "result_count": 10,
+    "top_sources": [
+      "https://en.wikipedia.org/wiki/2024_chess_world_championship",
+      "https://en.wikipedia.org/wiki/Chess_World_Cup_2025",
+      "https://en.wikipedia.org/wiki/2025_in_chess"
+    ],
+    "summary": "Gukesh Dommaraju is the current World Chess Champion. According to his Wikipedia page, he won the title in 2024 at the age of 18, becoming the youngest undisputed open-category world champion. This information is also consistent with other sources, including the International Chess Federation website, which refers to him as the World Champion."
   }
 ]

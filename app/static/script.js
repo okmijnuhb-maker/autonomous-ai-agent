@@ -7,6 +7,7 @@ let selectedFileObject = null; // ChatGPT-style file upload state tracker
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
   loadStats();
   loadTools();
   loadMemory();
@@ -191,7 +192,7 @@ async function sendMessage() {
 
   let finalPayloadMessage = message;
 
- if (selectedFileObject) {
+  if (selectedFileObject) {
     try {
       const fileName = selectedFileObject.name.toLowerCase();
       
@@ -266,6 +267,7 @@ async function sendMessage() {
     input.focus();
   }
 }
+
 // ============================================================
 // APPEND MESSAGE
 // ============================================================
@@ -276,23 +278,35 @@ function appendMessage(role, text, intent, tool, elapsed) {
   
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
-  bubble.textContent = text;
+  
+  if (role === 'agent') {
+    bubble.innerHTML = renderMarkdown(text);
+  } else {
+    bubble.textContent = text;
+  }
   msg.appendChild(bubble);
   
   if (role === 'agent' && intent) {
     const meta = document.createElement('div');
     meta.className = 'message-meta';
-    
+
     const badge = document.createElement('span');
     badge.className = `intent-badge badge-${intent}`;
     badge.textContent = badgeLabel(intent, tool);
     meta.appendChild(badge);
-    
+
     if (elapsed !== null) {
       const time = document.createElement('span');
       time.textContent = `${elapsed}s`;
       meta.appendChild(time);
     }
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = 'Copy';
+    copyBtn.onclick = () => copyMessage(copyBtn, text);
+    meta.appendChild(copyBtn);
+
     msg.appendChild(meta);
   }
   
@@ -549,4 +563,124 @@ function escapeHtml(text) {
   const d = document.createElement('div');
   d.textContent = text;
   return d.innerHTML;
+}
+
+// ============================================================
+// MARKDOWN RENDERING
+// ============================================================
+function renderMarkdown(text) {
+  try {
+    return marked.parse(text);
+  } catch (err) {
+    return text;
+  }
+}
+
+// ============================================================
+// DARK / LIGHT MODE
+// ============================================================
+function toggleTheme() {
+  const body = document.body;
+  const btn = document.getElementById('themeToggle');
+  body.classList.toggle('dark');
+  if (body.classList.contains('dark')) {
+    btn.textContent = 'Light Mode';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    btn.textContent = 'Dark Mode';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('themeToggle').textContent = 'Light Mode';
+  }
+}
+
+// ============================================================
+// COPY BUTTON
+// ============================================================
+function copyMessage(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(err => {
+    console.error('Copy failed:', err);
+  });
+}
+
+// ============================================================
+// VOICE INPUT
+// ============================================================
+let recognition = null;
+let isListening = false;
+
+function toggleVoice() {
+  if (isListening) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+function startVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Use Chrome or Edge.');
+    return;
+  }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    isListening = true;
+    const micBtn = document.getElementById('micBtn');
+    micBtn.classList.add('listening');
+    micBtn.textContent = '⏹';
+    document.getElementById('chatInput').placeholder = 'Listening...';
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('chatInput').value = transcript;
+    stopVoice();
+    sendMessage();
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Voice error:', event.error);
+    stopVoice();
+  };
+
+  recognition.onend = () => {
+    stopVoice();
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  isListening = false;
+  const micBtn = document.getElementById('micBtn');
+  if (micBtn) {
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+  }
+  const chatInput = document.getElementById('chatInput');
+  if (chatInput) {
+    chatInput.placeholder = 'Ask anything...';
+  }
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+  }
 }
