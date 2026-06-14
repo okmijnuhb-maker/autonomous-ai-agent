@@ -183,7 +183,7 @@ def read_file(filepath: str) -> str:
         "csv": read_csv,
         "pdf": read_pdf,
         "json": read_json,
-        "excel": read_excel
+        "excel": read_excel,
         "docx": read_docx
     }
     handler = routes.get(file_type)
