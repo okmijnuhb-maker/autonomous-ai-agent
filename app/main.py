@@ -43,10 +43,86 @@ from ddgs import DDGS
 MAX_TOOL_OUTPUT = 500
 
 def calculator(expression: str) -> str:
+    import re
     try:
-        return f"Result: {eval(expression, {'__builtins__': {}}, {'math': math})}"
+        clean = expression.lower().strip()
+
+        # Handle percentage
+        percent_match = re.search(r'(\d+\.?\d*)\s*%\s*of\s*(\d+\.?\d*)', clean)
+        if percent_match:
+            percent = float(percent_match.group(1))
+            total = float(percent_match.group(2))
+            result = (percent / 100) * total
+            return f"Result: {round(result, 6)}"
+
+        # Handle natural language math
+        clean = re.sub(r'\bplus\b', '+', clean)
+        clean = re.sub(r'\bminus\b', '-', clean)
+        clean = re.sub(r'\btimes\b', '*', clean)
+        clean = re.sub(r'\bdivided by\b', '/', clean)
+        clean = re.sub(r'\bto the power of\b', '**', clean)
+        clean = re.sub(r'\bsquared\b', '**2', clean)
+        clean = re.sub(r'\bcubed\b', '**3', clean)
+        clean = re.sub(r'\bsquare root of\b', 'math.sqrt', clean)
+
+        # Handle degree conversion
+        has_degrees = 'degree' in clean or '°' in clean
+        clean = re.sub(r'\bdegrees?\b', '', clean)
+        clean = re.sub(r'°', '', clean)
+
+        # Handle trig with ^ notation
+        clean = re.sub(r'sin\^2\(([^)]+)\)', r'math.sin(\1)**2', clean)
+        clean = re.sub(r'cos\^2\(([^)]+)\)', r'math.cos(\1)**2', clean)
+        clean = re.sub(r'tan\^2\(([^)]+)\)', r'math.tan(\1)**2', clean)
+
+        # Handle trig functions
+        if has_degrees:
+            clean = re.sub(r'sin\(([^)]+)\)', r'math.sin(math.radians(\1))', clean)
+            clean = re.sub(r'cos\(([^)]+)\)', r'math.cos(math.radians(\1))', clean)
+            clean = re.sub(r'tan\(([^)]+)\)', r'math.tan(math.radians(\1))', clean)
+        else:
+            clean = re.sub(r'sin\(([^)]+)\)', r'math.sin(\1)', clean)
+            clean = re.sub(r'cos\(([^)]+)\)', r'math.cos(\1)', clean)
+            clean = re.sub(r'tan\(([^)]+)\)', r'math.tan(\1)', clean)
+
+        # Handle log functions
+        clean = re.sub(r'log10\(([^)]+)\)', r'math.log10(\1)', clean)
+        clean = re.sub(r'log2\(([^)]+)\)', r'math.log2(\1)', clean)
+        clean = re.sub(r'log\(([^)]+)\)', r'math.log(\1)', clean)
+
+        # Handle other math functions
+        clean = re.sub(r'sqrt\(([^)]+)\)', r'math.sqrt(\1)', clean)
+        clean = re.sub(r'abs\(([^)]+)\)', r'abs(\1)', clean)
+        clean = re.sub(r'ceil\(([^)]+)\)', r'math.ceil(\1)', clean)
+        clean = re.sub(r'floor\(([^)]+)\)', r'math.floor(\1)', clean)
+        clean = re.sub(r'factorial\(([^)]+)\)', r'math.factorial(int(\1))', clean)
+        clean = re.sub(r'round\(([^)]+)\)', r'round(\1)', clean)
+
+        # Handle constants
+        clean = re.sub(r'\bpi\b', 'math.pi', clean)
+        clean = re.sub(r'\beuler\b|\b\be\b', 'math.e', clean)
+
+        # Handle ^ as power
+        clean = re.sub(r'\^', '**', clean)
+
+        # Extract only the math expression
+        match = re.search(r'[\d\s\+\-\*\/\(\)\.\%math\.piesqrtlogsincotan]+', clean)
+        expr = match.group(0).strip() if match else clean
+
+        safe_dict = {
+            "__builtins__": {},
+            "math": math,
+            "abs": abs,
+            "round": round,
+            "int": int,
+            "float": float
+        }
+
+        result = eval(expr, safe_dict)
+        return f"Result: {round(float(result), 6)}"
+
     except Exception as e:
-        return f"Calculator error: {e}"
+        return f"Calculator error: {e}. Please use format like '25 * 48' or 'sin(30 degrees)'"
 
 def wikipedia_tool(query: str) -> str:
     try:

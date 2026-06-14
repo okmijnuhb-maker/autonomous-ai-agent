@@ -119,17 +119,15 @@ def handle_tool(
         tool_result = tool_registry[tool_name]["fn"](user_input)
         cfg.tool_call_count += 1
         log.info(f"Tool call #{cfg.tool_call_count}: {tool_name}")
-        messages = [
-            {"role": "system", "content": cfg.system_prompt},
-            {"role": "user", "content": user_input},
-            {"role": "assistant", "content": f"Tool result: {tool_result}"},
-            {"role": "user", "content": "Summarize this tool result clearly and concisely."}
-        ]
+        messages = [{"role": "system", "content": cfg.system_prompt}]
+        messages += short_term.get_recent(4)
+        messages.append({"role": "user", "content": user_input})
+        messages.append({"role": "assistant", "content": f"Tool result: {tool_result}"})
+        messages.append({"role": "user", "content": "Summarize this tool result clearly and concisely."})
         return _call_llm(messages, client, cfg)
     except Exception as e:
         log.error(f"Tool handler failed: {e}")
         return handle_chat(user_input, short_term, client, cfg)
-
 
 def handle_search(
     user_input: str,
