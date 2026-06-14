@@ -1102,7 +1102,7 @@ def list_sessions():
             })
         except Exception:
             continue
-    return {"sessions": sessions} Levin
+    return {"sessions": sessions} 
 
 @app.get("/sessions/{session_id}")
 def get_session(session_id: str):
