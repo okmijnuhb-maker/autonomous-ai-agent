@@ -46,6 +46,14 @@ def calculator(expression: str) -> str:
     import re
     try:
         clean = expression.lower().strip()
+        
+        # Extract variable assignments like "x is 5" or "x = 5"
+        var_pattern = re.findall(r'([a-zA-Z])\s*(?:is|=)\s*([\d.]+)', clean)
+        variables = {var: float(val) for var, val in var_pattern}
+
+        # Substitute variables into expression
+        for var, val in variables.items():
+            clean = re.sub(rf'\b{var}\b', str(val), clean)
 
         # Handle percentage
         percent_match = re.search(r'(\d+\.?\d*)\s*%\s*of\s*(\d+\.?\d*)', clean)
@@ -125,21 +133,91 @@ def calculator(expression: str) -> str:
         return f"Calculator error: {e}. Please use format like '25 * 48' or 'sin(30 degrees)'"
 
 def wikipedia_tool(query: str) -> str:
+    import re
     try:
-        wiki = wikipediaapi.Wikipedia(language="en", user_agent="AutonomousAgent/1.0")
-        page = wiki.page(query)
-        return page.summary[:MAX_TOOL_OUTPUT] if page.exists() else f"No page found: {query}"
+        clean_query = re.sub(
+            r'(search wikipedia for|wikipedia|tell me about|who is|what is|explain)',
+            '', query.lower()
+        ).strip()
+
+        wiki = wikipediaapi.Wikipedia(
+            language="en",
+            user_agent="AutonomousAgent/1.0"
+        )
+
+        page = wiki.page(clean_query)
+
+        if not page.exists():
+            # Try title case
+            page = wiki.page(clean_query.title())
+
+        if not page.exists():
+            return f"No Wikipedia page found for: {clean_query}"
+
+        # Get summary
+        summary = page.summary[:800].strip()
+
+        # Get top sections
+        sections = []
+        for section in list(page.sections)[:3]:
+            if section.text:
+                sections.append(f"**{section.title}**\n{section.text[:200].strip()}")
+
+        # Build response
+        result = f"**{page.title}**\n\n"
+        result += f"{summary}\n\n"
+
+        if sections:
+            result += "**Key Sections:**\n"
+            result += "\n\n".join(sections)
+
+        result += f"\n\nSource: {page.fullurl}"
+
+        return result
+
     except Exception as e:
         return f"Wikipedia error: {e}"
 
 def web_search_tool(query: str) -> str:
+    import re
     try:
+        news_keywords = [
+            'news', 'latest', 'today', 'recent', 'breaking',
+            'update', 'current', 'happening', 'just in', 'announced'
+        ]
+        query_lower = query.lower()
+        is_news = any(keyword in query_lower for keyword in news_keywords)
+
         with DDGS() as ddgs:
+            if is_news:
+                results = list(ddgs.news(query, max_results=5))
+                if results:
+                    lines = [f"**Latest News: {query}**\n"]
+                    for i, r in enumerate(results, 1):
+                        title = r.get('title', '')
+                        source = r.get('source', '')
+                        date = r.get('date', '')
+                        body = r.get('body', '')[:150]
+                        url = r.get('url', '')
+                        lines.append(
+                            f"{i}. **{title}**\n"
+                            f"   Source: {source} | {date}\n"
+                            f"   {body}\n"
+                            f"   {url}\n"
+                        )
+                    return "\n".join(lines)
+
+            # Regular web search
             results = list(ddgs.text(query, max_results=3))
-        return "\n".join([f"{r['title']}: {r['body'][:150]}" for r in results]) if results else "No results."
+            if results:
+                return "\n".join([
+                    f"{r['title']}: {r['body'][:150]}"
+                    for r in results
+                ])
+            return "No results found."
+
     except Exception as e:
         return f"Web search error: {e}"
-
 def file_reader(filepath: str) -> str:
     import re
     from pathlib import Path
@@ -166,6 +244,24 @@ def file_reader(filepath: str) -> str:
             return extracted_text[:8000]
         except Exception as pdf_err:
             return f"Failed to extract text from PDF: {str(pdf_err)}"
+
+    if path.suffix.lower() in [".docx", ".doc"]:
+        try:
+            from docx import Document
+            doc = Document(path)
+            content = []
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    content.append(para.text.strip())
+            for i, table in enumerate(doc.tables):
+                for row in table.rows:
+                    row_text = " | ".join(cell.text.strip() for cell in row.cells)
+                    if row_text.strip():
+                        content.append(row_text)
+            result = "\n".join(content)
+            return result[:8000] if result else "Document appears to be empty."
+        except Exception as e:
+            return f"DOCX read error: {e}"
 
     try:
         from tools.file_handler import read_file
@@ -329,6 +425,160 @@ def unit_converter(query: str) -> str:
     except Exception as e:
         return f"Unit converter error: {e}"
 
+def currency_converter(query: str) -> str:
+    import re
+    try:
+        CURRENCY_NAMES = {
+            "dollar": "USD", "dollars": "USD", "usd": "USD",
+            "rupee": "INR", "rupees": "INR", "inr": "INR",
+            "euro": "EUR", "euros": "EUR", "eur": "EUR",
+            "pound": "GBP", "pounds": "GBP", "gbp": "GBP",
+            "yen": "JPY", "jpy": "JPY",
+            "dirham": "AED", "aed": "AED",
+            "singapore dollar": "SGD", "sgd": "SGD",
+            "australian dollar": "AUD", "aud": "AUD",
+            "canadian dollar": "CAD", "cad": "CAD",
+            "swiss franc": "CHF", "chf": "CHF",
+            "yuan": "CNY", "cny": "CNY", "renminbi": "CNY",
+            "riyal": "SAR", "sar": "SAR",
+            "won": "KRW", "krw": "KRW",
+            "baht": "THB", "thb": "THB",
+            "ringgit": "MYR", "myr": "MYR",
+            "peso": "MXN", "mxn": "MXN",
+            "real": "BRL", "brl": "BRL",
+            "ruble": "RUB", "rub": "RUB",
+            "lira": "TRY", "try": "TRY",
+            "krona": "SEK", "sek": "SEK",
+            "nok": "NOK", "krone": "NOK",
+            "dkk": "DKK",
+            "zloty": "PLN", "pln": "PLN",
+            "taka": "BDT", "bdt": "BDT",
+            "rupiah": "IDR", "idr": "IDR",
+            "pkr": "PKR",
+            "qar": "QAR", "qatari riyal": "QAR",
+            "kwd": "KWD", "kuwaiti dinar": "KWD",
+        }
+
+        query_lower = query.lower()
+
+        # Replace currency names with codes
+        for name, code in sorted(CURRENCY_NAMES.items(), key=lambda x: -len(x[0])):
+            query_lower = query_lower.replace(name, code)
+
+        # Extract amount, from currency, to currency
+        pattern = re.search(
+            r'([\d,]+\.?\d*)\s*([A-Z]{3})\s+(?:to|in|into)\s+([A-Z]{3})',
+            query_lower.upper()
+        )
+
+        if not pattern:
+            return "Could not parse currency conversion. Use format: '100 USD to INR'"
+
+        amount = float(pattern.group(1).replace(",", ""))
+        from_currency = pattern.group(2)
+        to_currency = pattern.group(3)
+
+        # Fetch live exchange rate from frankfurter.app (free, no API key)
+        url = f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+
+        if "rates" not in data:
+            return f"Could not fetch exchange rate for {from_currency} to {to_currency}"
+
+        result = data["rates"][to_currency]
+        return f"{amount:,.2f} {from_currency} = {result:,.2f} {to_currency}"
+
+    except Exception as e:
+        return f"Currency converter error: {e}"
+
+def text_translator(query: str) -> str:
+    import re
+    try:
+        LANGUAGE_CODES = {
+            "english": "en", "hindi": "hi", "telugu": "te",
+            "tamil": "ta", "kannada": "kn", "malayalam": "ml",
+            "marathi": "mr", "bengali": "bn", "gujarati": "gu",
+            "punjabi": "pa", "urdu": "ur", "odia": "or",
+            "french": "fr", "spanish": "es", "german": "de",
+            "italian": "it", "portuguese": "pt", "dutch": "nl",
+            "russian": "ru", "arabic": "ar", "chinese": "zh",
+            "japanese": "ja", "korean": "ko", "turkish": "tr",
+            "polish": "pl", "swedish": "sv", "norwegian": "no",
+            "danish": "da", "finnish": "fi", "greek": "el",
+            "hebrew": "he", "thai": "th", "vietnamese": "vi",
+            "indonesian": "id", "malay": "ms", "czech": "cs",
+            "romanian": "ro", "hungarian": "hu", "ukrainian": "uk",
+        }
+
+        query_lower = query.lower()
+
+        # Extract target language
+        to_lang_match = re.search(
+            r'(?:to|into|in)\s+([a-zA-Z]+)(?:\s|$)',
+            query_lower
+        )
+        to_lang_name = to_lang_match.group(1).strip() if to_lang_match else "english"
+        to_lang_code = LANGUAGE_CODES.get(to_lang_name, "en")
+
+        # Extract source language if mentioned
+        from_lang_match = re.search(
+            r'(?:from)\s+([a-zA-Z]+)\s+(?:to|into)',
+            query_lower
+        )
+        from_lang_code = "auto"
+        if from_lang_match:
+            from_lang_name = from_lang_match.group(1).strip()
+            from_lang_code = LANGUAGE_CODES.get(from_lang_name, "auto")
+
+        # Extract text to translate
+        patterns = [
+            r'translate\s+"([^"]+)"',
+            r"translate\s+'([^']+)'",
+            r'translate\s+(.+?)\s+(?:to|into|in)\s+[a-zA-Z]+',
+            r'"([^"]+)"\s+(?:to|into)\s+[a-zA-Z]+',
+        ]
+
+        text_to_translate = None
+        for pattern in patterns:
+            match = re.search(pattern, query_lower)
+            if match:
+                text_to_translate = match.group(1).strip()
+                break
+
+        if not text_to_translate:
+            # Use entire query minus the translation instruction
+            text_to_translate = re.sub(
+                r'(translate|to\s+\w+|into\s+\w+|from\s+\w+)', '', query_lower
+            ).strip()
+
+        if not text_to_translate:
+            return "Please provide text to translate. Example: translate hello to french"
+
+        # Use MyMemory API — free, no API key needed
+        url = "https://api.mymemory.translated.net/get"
+        lang_pair = f"{from_lang_code}|{to_lang_code}" if from_lang_code != "auto" else f"en|{to_lang_code}"
+        
+        params = {
+            "q": text_to_translate,
+            "langpair": lang_pair
+        }
+        
+        r = requests.get(url, params=params, timeout=10)
+        data = r.json()
+        
+        if data.get("responseStatus") == 200:
+            translated = data["responseData"]["translatedText"]
+            return (
+                f"Original  : {text_to_translate}\n"
+                f"Translated: {translated}\n"
+                f"Language  : {to_lang_name.title()}"
+            )
+        return f"Translation failed: {data.get('responseDetails', 'Unknown error')}"
+
+    except Exception as e:
+        return f"Translator error: {e}"
+
 def dictionary_tool(word: str) -> str:
     import re
     # Extract just the word from the query
@@ -355,11 +605,142 @@ def dictionary_tool(word: str) -> str:
         return f"Dictionary error: {e}"
 
 def weather_tool(city: str) -> str:
+    import re
     try:
-        r = requests.get(f"https://wttr.in/{city.replace(' ', '+')}?format=3", timeout=5)
-        return r.text.strip()
+        clean_city = re.sub(r'(weather in|weather for|what is the weather in|how is the weather in)', '', city.lower()).strip()
+        url = f"https://wttr.in/{clean_city.replace(' ', '+')}?format=j1"
+        r = requests.get(url, timeout=10)
+        data = r.json()
+        current = data["current_condition"][0]
+        area = data["nearest_area"][0]
+        city_name = area["areaName"][0]["value"]
+        country = area["country"][0]["value"]
+        temp_c = current["temp_C"]
+        feels_like = current["FeelsLikeC"]
+        humidity = current["humidity"]
+        wind_speed = current["windspeedKmph"]
+        wind_dir = current["winddir16Point"]
+        visibility = current["visibility"]
+        uv_index = current["uvIndex"]
+        description = current["weatherDesc"][0]["value"]
+        return (
+            f"Weather in {city_name}, {country}:\n"
+            f"Condition    : {description}\n"
+            f"Temperature : {temp_c}°C (Feels like {feels_like}°C)\n"
+            f"Humidity     : {humidity}%\n"
+            f"Wind        : {wind_speed} km/h {wind_dir}\n"
+            f"Visibility  : {visibility} km\n"
+            f"UV Index    : {uv_index}"
+        )
     except Exception as e:
-        return f"Weather error: {e}"
+        try:
+            r = requests.get(f"https://wttr.in/{city.replace(' ', '+')}?format=3", timeout=5)
+            return r.text.strip()
+        except:
+            return f"Weather error: {e}"
+
+def qr_generator(query: str) -> str:
+    import re
+    import qrcode
+    from pathlib import Path
+
+    try:
+        clean = re.sub(
+            r'(generate qr|create qr|make qr|qr code for|qr for)',
+            '', query.lower()
+        ).strip()
+
+        if not clean:
+            return "Please provide text or URL to generate QR code."
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4
+        )
+        qr.add_data(clean)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        upload_dir = Path(BASE_PATH) / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+
+        filename = f"qr_{int(time.time())}.png"
+        filepath = upload_dir / filename
+        img.save(str(filepath))
+
+        return (
+            f"QR code generated successfully!\n"
+            f"Content : {clean}\n"
+            f"File    : {filename}\n"
+            f"Access  : /uploads/{filename}"
+        )
+
+    except Exception as e:
+        return f"QR generator error: {e}"
+
+def password_generator(query: str) -> str:
+    import re
+    import secrets
+    import string
+    try:
+        query_lower = query.lower()
+
+        # Extract length from query
+        length_match = re.search(r'(\d+)\s*(?:character|char|digit|letter|length)?', query_lower)
+        length = int(length_match.group(1)) if length_match else 16
+        length = max(8, min(length, 64))
+
+        # Detect what to include
+        include_upper = 'no upper' not in query_lower
+        include_numbers = 'no number' not in query_lower
+        include_symbols = any(w in query_lower for w in [
+            'symbol', 'special', 'strong', 'secure'
+        ]) or 'no symbol' not in query_lower
+
+        # Build character set
+        chars = string.ascii_lowercase
+        if include_upper:
+            chars += string.ascii_uppercase
+        if include_numbers:
+            chars += string.digits
+        if include_symbols:
+            chars += string.punctuation
+
+        # Generate password
+        password = ''.join(secrets.choice(chars) for _ in range(length))
+
+        # Calculate strength
+        strength = "Weak"
+        score = sum([
+            any(c.islower() for c in password),
+            any(c.isupper() for c in password),
+            any(c.isdigit() for c in password),
+            any(c in string.punctuation for c in password),
+            length >= 12,
+            length >= 16
+        ])
+        if score >= 5:
+            strength = "Very Strong"
+        elif score >= 4:
+            strength = "Strong"
+        elif score >= 3:
+            strength = "Medium"
+
+        return (
+            f"Generated Password: `{password}`\n"
+            f"Length   : {length} characters\n"
+            f"Strength : {strength}\n"
+            f"Contains : "
+            f"{'Uppercase ' if include_upper else ''}"
+            f"{'Numbers ' if include_numbers else ''}"
+            f"{'Symbols' if include_symbols else ''}"
+        )
+
+    except Exception as e:
+        return f"Password generator error: {e}"
 
 def csv_analyzer(filepath: str) -> str:
     try:
@@ -386,16 +767,20 @@ def system_info(query: str) -> str:
         return f"System info error: {e}"
 
 TOOL_REGISTRY = {
-    "calculator":     {"fn": calculator,      "description": "Evaluates math expressions."},
-    "wikipedia":      {"fn": wikipedia_tool,  "description": "Fetches Wikipedia summary."},
-    "web_search":     {"fn": web_search_tool, "description": "Searches the web via DuckDuckGo."},
-    "file_reader":    {"fn": file_reader,      "description": "Reads txt, csv, pdf, json files."},
-    "datetime_tool":  {"fn": datetime_tool,   "description": "Returns current date/time/day."},
+    "calculator":      {"fn": calculator,      "description": "Evaluates math expressions."},
+    "wikipedia":       {"fn": wikipedia_tool,  "description": "Fetches Wikipedia summary."},
+    "web_search":      {"fn": web_search_tool, "description": "Searches the web via DuckDuckGo."},
+    "file_reader":     {"fn": file_reader,      "description": "Reads txt, csv, pdf, json files."},
+    "datetime_tool":   {"fn": datetime_tool,   "description": "Returns current date/time/day."},
     "unit_converter": {"fn": unit_converter,  "description": "Converts units (km, kg, celsius, etc)."},
-    "dictionary":     {"fn": dictionary_tool, "description": "Returns word definition."},
-    "weather":        {"fn": weather_tool,    "description": "Returns current weather by city."},
+    "dictionary":      {"fn": dictionary_tool, "description": "Returns word definition."},
+    "weather":         {"fn": weather_tool,    "description": "Returns current weather by city."},
     "csv_analyzer":   {"fn": csv_analyzer,    "description": "Analyzes CSV file statistics."},
-    "system_info":    {"fn": system_info,     "description": "Returns system CPU/RAM/disk usage."},
+    "system_info":     {"fn": system_info,     "description": "Returns system CPU/RAM/disk usage."},
+    "currency_converter": {"fn": currency_converter, "description": "Converts currency using live exchange rates. Example: 100 USD to INR"},
+    "text_translator": {"fn": text_translator, "description": "Translates text to any language. Example: translate hello to french"},
+    "qr_generator": {"fn": qr_generator, "description": "Generates QR code for any text or URL. Example: generate qr code for https://google.com"},
+    "password_generator": {"fn": password_generator, "description": "Generates secure random password. Example: generate a 16 character strong password"},
 }
 
 # --- app init ---
@@ -410,6 +795,11 @@ app.add_middleware(
 
 static_path = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+
+from fastapi.staticfiles import StaticFiles as SF
+upload_dir = Path(BASE_PATH) / "uploads"
+upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", SF(directory=str(upload_dir)), name="uploads")
 
 client = init_client()
 config = AgentConfig()
@@ -538,6 +928,108 @@ def chat(req: ChatRequest):
         log.error(f"Chat endpoint error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# --- NEW STREAMING ENDPOINT INTEGRATION ---
+from fastapi.responses import StreamingResponse
+import asyncio
+
+@app.post("/chat/stream")
+async def chat_stream(req: ChatRequest):
+    try:
+        import time
+        start = time.time()
+                
+        # Classify intent first
+        from agent.orchestrator import classify_intent
+        intent, tool = classify_intent(req.message, client, config)
+                
+        # Only stream for chat intent
+        if intent != "chat":
+            reply, intent, tool = orchestrate(
+                user_input=req.message,
+                client=client,
+                cfg=config,
+                short_term=short_term,
+                long_term=long_term,
+                tool_registry=TOOL_REGISTRY,
+                search_history=search_history
+            )
+            elapsed = round(time.time() - start, 2)
+            final_reply = build_response(reply, intent, tool, elapsed, config)
+                        
+            if len(current_session["messages"]) == 0:
+                current_session["title"] = generate_title(req.message)
+            current_session["messages"].append({
+                "role": "user", "text": req.message,
+                "intent": None, "tool": None, "elapsed": None,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+            current_session["messages"].append({
+                "role": "agent", "text": final_reply,
+                "intent": intent, "tool": tool, "elapsed": elapsed,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+            save_session()
+                        
+            async def non_stream():
+                yield f"data: {json.dumps({'type': 'metadata', 'intent': intent, 'tool': tool, 'elapsed': elapsed})}\n\n"
+                yield f"data: {json.dumps({'type': 'full', 'content': final_reply})}\n\n"
+                yield "data: [DONE]\n\n"
+            return StreamingResponse(non_stream(), media_type="text/event-stream")
+        
+        # Stream for chat intent
+        messages = [{"role": "system", "content": config.system_prompt}]
+        messages += short_term.get_recent(6)
+        messages.append({"role": "user", "content": req.message})
+        
+        async def generate():
+            full_reply = ""
+            stream = client.chat.completions.create(
+                model=config.model,
+                messages=messages,
+                max_tokens=config.max_tokens,
+                temperature=config.temperature,
+                stream=True
+            )
+            yield f"data: {json.dumps({'type': 'metadata', 'intent': 'chat', 'tool': None})}\n\n"
+                        
+            for chunk in stream:
+                delta = chunk.choices[0].delta
+                if hasattr(delta, 'content') and delta.content:
+                    full_reply += delta.content
+                    yield f"data: {json.dumps({'type': 'chunk', 'content': delta.content})}\n\n"
+                    await asyncio.sleep(0)
+            elapsed = round(time.time() - start, 2)
+            config.session_token_count += len(full_reply.split()) * 1.3
+            config.total_turns += 1
+            config.intent_counts["chat"] += 1
+            config.response_times["chat"].append(elapsed)
+            short_term.add("user", req.message)
+            short_term.add("assistant", full_reply)
+            long_term.store(
+                memory_id=f"turn_{config.total_turns}_{int(time.time())}",
+                text=f"User: {req.message}\nAssistant: {full_reply}",
+                metadata={"turn": config.total_turns, "timestamp": int(time.time())}
+            )
+            if len(current_session["messages"]) == 0:
+                current_session["title"] = generate_title(req.message)
+            current_session["messages"].append({
+                "role": "user", "text": req.message,
+                "intent": None, "tool": None, "elapsed": None,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+            current_session["messages"].append({
+                "role": "agent", "text": full_reply,
+                "intent": "chat", "tool": None, "elapsed": elapsed,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+            save_session()
+            yield f"data: {json.dumps({'type': 'done', 'elapsed': elapsed})}\n\n"
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(generate(), media_type="text/event-stream")
+    except Exception as e:
+        log.error(f"Stream endpoint error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/memory")
 def get_memory():
     return {
@@ -610,7 +1102,7 @@ def list_sessions():
             })
         except Exception:
             continue
-    return {"sessions": sessions}
+    return {"sessions": sessions} Levin
 
 @app.get("/sessions/{session_id}")
 def get_session(session_id: str):

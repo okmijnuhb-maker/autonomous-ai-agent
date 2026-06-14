@@ -15,3 +15,5 @@ uvicorn
 jinja2
 python-multipart
 pytz
+qrcode[pil]
+python-docx

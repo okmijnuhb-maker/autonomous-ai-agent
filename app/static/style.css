@@ -1136,3 +1136,21 @@ body.dark .message-bubble pre {
   background: #0F172A;
   color: #E2E8F0;
 }
+
+/* ============================================================
+   MESSAGE TIMESTAMPS
+   ============================================================ */
+.message-timestamp {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+  opacity: 0.7;
+}
+
+.message.user .message-timestamp {
+  text-align: right;
+}
+
+.message.agent .message-timestamp {
+  text-align: left;
+}

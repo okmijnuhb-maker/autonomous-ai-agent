@@ -28,12 +28,6 @@ function handleFileSelect() {
   document.getElementById('filePreview').style.display = 'flex';
 }
 
-function clearSelectedFile() {
-  selectedFileObject = null;
-  document.getElementById('fileUploadInput').value = '';
-  document.getElementById('filePreview').style.display = 'none';
-}
-
 // ============================================================
 // SESSION MANAGEMENT
 // ============================================================
@@ -182,7 +176,7 @@ function chipSend(text) {
 }
 
 // ============================================================
-// SEND MESSAGE (UPDATED DIRECT FILE STREAM Interceptor)
+// SEND MESSAGE
 // ============================================================
 async function sendMessage() {
   const input = document.getElementById('chatInput');
@@ -202,6 +196,12 @@ async function sendMessage() {
         const uploadRes = await fetch(`${API}/upload`, { method: "POST", body: formData });
         const uploadData = await uploadRes.json();
         finalPayloadMessage = `PDF_PATH:${uploadData.absolute_path}||||USER_REQUEST:${message || "Summarize this file"}`;
+      } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+        const formData = new FormData();
+        formData.append("file", selectedFileObject);
+        const uploadRes = await fetch(`${API}/upload`, { method: "POST", body: formData });
+        const uploadData = await uploadRes.json();
+        finalPayloadMessage = `read this file ${uploadData.absolute_path}`;
       } else {
         // Read file content directly in browser
         const fileText = await selectedFileObject.text();
@@ -231,20 +231,97 @@ async function sendMessage() {
   appendMessage('user', bubbleText, null, null, null);
   showTyping(true);
   
-  try {
-    const res = await fetch(`${API}/chat`, {
+ try {
+    const res = await fetch(`${API}/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: finalPayloadMessage })
     });
-    const data = await res.json();
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
     showTyping(false);
-    
-    appendMessage('agent', data.reply, data.intent, data.tool, data.elapsed);
-    loadMemory();
-    loadStats();
-    loadSessions();
-    if (data.intent === 'search') loadSearchHistory();
+
+    let agentBubble = null;
+    let agentMsg = null;
+    let fullText = '';
+    let intentData = { intent: 'chat', tool: null, elapsed: null };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+      
+      for (const line of lines) {
+        const dataStr = line.replace('data: ', '').trim();
+        if (dataStr === '[DONE]') break;
+        
+        try {
+          const data = JSON.parse(dataStr);
+          
+          if (data.type === 'metadata') {
+            intentData = { intent: data.intent, tool: data.tool, elapsed: data.elapsed };
+          }
+          
+          if (data.type === 'chunk') {
+            if (!agentBubble) {
+              agentMsg = document.createElement('div');
+              agentMsg.className = 'message agent';
+              agentBubble = document.createElement('div');
+              agentBubble.className = 'message-bubble';
+              agentMsg.appendChild(agentBubble);
+              document.getElementById('chatHistory').appendChild(agentMsg);
+            }
+            fullText += data.content;
+            agentBubble.innerHTML = renderMarkdown(fullText);
+            autoScroll();
+          }
+          
+          if (data.type === 'full') {
+            fullText = data.content;
+            showTyping(false);
+            appendMessage('agent', fullText, intentData.intent, intentData.tool, intentData.elapsed);
+          }
+          
+          if (data.type === 'done') {
+            intentData.elapsed = data.elapsed;
+            if (agentMsg && agentBubble) {
+              agentBubble.innerHTML = renderMarkdown(fullText);
+              const meta = document.createElement('div');
+              meta.className = 'message-meta';
+              const badge = document.createElement('span');
+              badge.className = `intent-badge badge-${intentData.intent}`;
+              badge.textContent = badgeLabel(intentData.intent, intentData.tool);
+              meta.appendChild(badge);
+              const timeEl = document.createElement('span');
+              timeEl.textContent = `${data.elapsed}s`;
+              meta.appendChild(timeEl);
+              const copyBtn = document.createElement('button');
+              copyBtn.className = 'copy-btn';
+              copyBtn.textContent = 'Copy';
+              copyBtn.onclick = () => copyMessage(copyBtn, fullText);
+              meta.appendChild(copyBtn);
+              const timestamp = document.createElement('div');
+              timestamp.className = 'message-timestamp';
+              const now = new Date();
+              timestamp.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit', hour12: true 
+              });
+              agentMsg.appendChild(meta);
+              agentMsg.appendChild(timestamp);
+            }
+            loadMemory();
+            loadStats();
+            loadSessions();
+            if (intentData.intent === 'search') loadSearchHistory();
+          }
+        } catch(e) {
+          console.error('Parse error:', e);
+        }
+      }
+    }
   } catch (err) {
     showTyping(false);
     appendMessage('agent', 'Connection error. Make sure the server is running.', 'chat', null, null);
@@ -257,7 +334,7 @@ async function sendMessage() {
 }
 
 // ============================================================
-// APPEND MESSAGE
+// APPEND MESSAGE (UPDATED WITH EMBEDDED TIMESTAMP INJECTION)
 // ============================================================
 function appendMessage(role, text, intent, tool, elapsed) {
   const history = document.getElementById('chatHistory');
@@ -272,7 +349,19 @@ function appendMessage(role, text, intent, tool, elapsed) {
   } else {
     bubble.textContent = text;
   }
+  
   msg.appendChild(bubble);
+  
+  // Insert timestamp directly beneath the message bubble element wrapper layout
+  const timestamp = document.createElement('div');
+  timestamp.className = 'message-timestamp';
+  const now = new Date();
+  timestamp.textContent = now.toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: true 
+  });
+  msg.appendChild(timestamp);
   
   if (role === 'agent' && intent) {
     const meta = document.createElement('div');
@@ -573,13 +662,11 @@ function toggleTheme() {
   }
 }
 
-// Added baseline theme verification bootstrap hook
 function loadTheme() {
   const saved = localStorage.getItem('theme');
   if (saved === 'dark') {
     document.body.classList.add('dark');
-    const btn = document.getElementById('themeToggle');
-    if (btn) btn.textContent = 'Light Mode';
+    document.getElementById('themeToggle').textContent = 'Light Mode';
   }
 }
 
@@ -627,18 +714,14 @@ function startVoice() {
   recognition.onstart = () => {
     isListening = true;
     const micBtn = document.getElementById('micBtn');
-    if (micBtn) {
-      micBtn.classList.add('listening');
-      micBtn.textContent = '⏹';
-    }
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) chatInput.placeholder = 'Listening...';
+    micBtn.classList.add('listening');
+    micBtn.textContent = '⏹';
+    document.getElementById('chatInput').placeholder = 'Listening...';
   };
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) chatInput.value = transcript;
+    document.getElementById('chatInput').value = transcript;
     stopVoice();
     sendMessage();
   };
@@ -658,12 +741,9 @@ function startVoice() {
 function stopVoice() {
   isListening = false;
   const micBtn = document.getElementById('micBtn');
-  if (micBtn) {
-    micBtn.classList.remove('listening');
-    micBtn.textContent = '🎤';
-  }
-  const chatInput = document.getElementById('chatInput');
-  if (chatInput) chatInput.placeholder = 'Ask anything...';
+  micBtn.classList.remove('listening');
+  micBtn.textContent = '🎤';
+  document.getElementById('chatInput').placeholder = 'Ask anything...';
   if (recognition) {
     recognition.stop();
     recognition = null;

@@ -22,7 +22,8 @@ def detect_file_type(filepath: str) -> str:
         ".csv": "csv",
         ".pdf": "pdf",
         ".json": "json",
-        ".xlsx": "excel", ".xls": "excel"
+        ".xlsx": "excel", ".xls": "excel",
+        ".docx": "docx", ".doc": "docx"
     }
     return type_map.get(suffix, "unknown")
 
@@ -119,6 +120,39 @@ def read_excel(filepath: str) -> str:
         log.error(f"Excel read failed: {e}")
         return f"Excel read error: {e}"
 
+def read_docx(filepath: str) -> str:
+    try:
+        from docx import Document
+        doc = Document(filepath)
+
+        content = []
+
+        # Extract paragraphs
+        for para in doc.paragraphs:
+            if para.text.strip():
+                if para.style.name.startswith('Heading'):
+                    content.append(f"\n**{para.text.strip()}**")
+                else:
+                    content.append(para.text.strip())
+
+        # Extract tables
+        for i, table in enumerate(doc.tables):
+            content.append(f"\n**Table {i+1}:**")
+            for row in table.rows:
+                row_text = " | ".join(
+                    cell.text.strip() for cell in row.cells
+                )
+                if row_text.strip():
+                    content.append(row_text)
+
+        result = "\n".join(content)
+        log.info(f"DOCX read — {len(doc.paragraphs)} paragraphs, {len(doc.tables)} tables")
+        return result[:MAX_TEXT_OUTPUT] if result else "Document appears to be empty."
+
+    except Exception as e:
+        log.error(f"DOCX read failed: {e}")
+        return f"DOCX read error: {e}"
+
 
 def scan_directory(dirpath: str) -> str:
     try:
@@ -150,6 +184,7 @@ def read_file(filepath: str) -> str:
         "pdf": read_pdf,
         "json": read_json,
         "excel": read_excel
+        "docx": read_docx
     }
     handler = routes.get(file_type)
     if not handler:
