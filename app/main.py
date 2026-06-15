@@ -218,12 +218,14 @@ def web_search_tool(query: str) -> str:
 
     except Exception as e:
         return f"Web search error: {e}"
+        
 def file_reader(filepath: str) -> str:
     import re
     from pathlib import Path
 
-    match = re.search(r'([A-Za-z]:[^\|]+\.\w+)', filepath)
+    match = re.search(r'([A-Za-z]:[^\|]+\.\w+|/[^\|]+\.\w+)', filepath)
     actual_path = match.group(1).strip() if match else filepath.strip()
+    actual_path = actual_path.replace("\\", "/")
     path = Path(actual_path)
 
     if not path.exists():
@@ -253,7 +255,7 @@ def file_reader(filepath: str) -> str:
             for para in doc.paragraphs:
                 if para.text.strip():
                     content.append(para.text.strip())
-            for i, table in enumerate(doc.tables):
+            for table in doc.tables:
                 for row in table.rows:
                     row_text = " | ".join(cell.text.strip() for cell in row.cells)
                     if row_text.strip():
@@ -661,10 +663,9 @@ def qr_generator(query: str) -> str:
         )
         qr.add_data(clean)
         qr.make(fit=True)
-
         img = qr.make_image(fill_color="black", back_color="white")
 
-        upload_dir = Path(BASE_PATH) / "uploads"
+        upload_dir = Path(__file__).resolve().parent.parent / "uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
 
         filename = f"qr_{int(time.time())}.png"
@@ -674,8 +675,7 @@ def qr_generator(query: str) -> str:
         return (
             f"QR code generated successfully!\n"
             f"Content : {clean}\n"
-            f"File    : {filename}\n"
-            f"Access  : /uploads/{filename}"
+            f"File    : {filename}"
         )
 
     except Exception as e:
