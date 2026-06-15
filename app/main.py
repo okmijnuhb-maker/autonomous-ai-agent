@@ -270,7 +270,7 @@ def file_reader(filepath: str) -> str:
         return read_file(actual_path)
     except Exception as e:
         return f"File reader error: {e}"
-
+        
 def datetime_tool(query: str) -> str:
     import pytz
     import re
