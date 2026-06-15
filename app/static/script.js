@@ -28,6 +28,18 @@ function handleFileSelect() {
   document.getElementById('filePreview').style.display = 'flex';
 }
 
+function clearSelectedFile() {
+  selectedFileObject = null;
+  const fileUploadInput = document.getElementById('fileUploadInput');
+  if (fileUploadInput) fileUploadInput.value = '';
+  
+  const filePreview = document.getElementById('filePreview');
+  if (filePreview) filePreview.style.display = 'none';
+  
+  const previewFileName = document.getElementById('previewFileName');
+  if (previewFileName) previewFileName.textContent = '';
+}
+
 // ============================================================
 // SESSION MANAGEMENT
 // ============================================================
@@ -231,7 +243,7 @@ async function sendMessage() {
   appendMessage('user', bubbleText, null, null, null);
   showTyping(true);
   
- try {
+  try {
     const res = await fetch(`${API}/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -291,18 +303,22 @@ async function sendMessage() {
               agentBubble.innerHTML = renderMarkdown(fullText);
               const meta = document.createElement('div');
               meta.className = 'message-meta';
+              
               const badge = document.createElement('span');
               badge.className = `intent-badge badge-${intentData.intent}`;
               badge.textContent = badgeLabel(intentData.intent, intentData.tool);
               meta.appendChild(badge);
+              
               const timeEl = document.createElement('span');
               timeEl.textContent = `${data.elapsed}s`;
               meta.appendChild(timeEl);
+              
               const copyBtn = document.createElement('button');
               copyBtn.className = 'copy-btn';
               copyBtn.textContent = 'Copy';
               copyBtn.onclick = () => copyMessage(copyBtn, fullText);
               meta.appendChild(copyBtn);
+              
               const timestamp = document.createElement('div');
               timestamp.className = 'message-timestamp';
               const now = new Date();
@@ -334,7 +350,7 @@ async function sendMessage() {
 }
 
 // ============================================================
-// APPEND MESSAGE (UPDATED WITH EMBEDDED TIMESTAMP INJECTION)
+// APPEND MESSAGE
 // ============================================================
 function appendMessage(role, text, intent, tool, elapsed) {
   const history = document.getElementById('chatHistory');
@@ -352,7 +368,6 @@ function appendMessage(role, text, intent, tool, elapsed) {
   
   msg.appendChild(bubble);
   
-  // Insert timestamp directly beneath the message bubble element wrapper layout
   const timestamp = document.createElement('div');
   timestamp.className = 'message-timestamp';
   const now = new Date();
@@ -714,8 +729,10 @@ function startVoice() {
   recognition.onstart = () => {
     isListening = true;
     const micBtn = document.getElementById('micBtn');
-    micBtn.classList.add('listening');
-    micBtn.textContent = '⏹';
+    if (micBtn) {
+      micBtn.classList.add('listening');
+      micBtn.textContent = '⏹';
+    }
     document.getElementById('chatInput').placeholder = 'Listening...';
   };
 
@@ -741,8 +758,10 @@ function startVoice() {
 function stopVoice() {
   isListening = false;
   const micBtn = document.getElementById('micBtn');
-  micBtn.classList.remove('listening');
-  micBtn.textContent = '🎤';
+  if (micBtn) {
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+  }
   document.getElementById('chatInput').placeholder = 'Ask anything...';
   if (recognition) {
     recognition.stop();
