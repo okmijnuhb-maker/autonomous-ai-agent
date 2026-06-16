@@ -1,10 +1,12 @@
 # Autonomous AI Agent
 
-A Multi-Capability Autonomous AI Agent with conversational memory, 10 tools, 
-real-time web search, file handling, and a ChatGPT-style web interface.
+A Multi-Capability Autonomous AI Agent with conversational memory, 14 tools, real-time web search, file handling, and a ChatGPT-style web interface.
 
 **Live Demo:** https://autonomous-ai-agent-gdcx.onrender.com
-First visit may take 30-60 seconds to wake up on Render free tier.
+
+> First visit may take 30-60 seconds to wake up on Render free tier.
+
+> Note: Conversation history resets if the server restarts (Render free tier limitation). All features work fully within an active session.
 
 ---
 
@@ -15,6 +17,7 @@ First visit may take 30-60 seconds to wake up on Render free tier.
 | LLM | Groq API — llama-3.3-70b-versatile |
 | Backend | FastAPI + Uvicorn |
 | Memory | ChromaDB + short-term deque buffer |
+| Storage | Local JSON files + ChromaDB persistent vector store |
 | Search | DuckDuckGo (ddgs) |
 | Frontend | HTML, CSS, JavaScript |
 | Deployment | Render |
@@ -24,24 +27,19 @@ First visit may take 30-60 seconds to wake up on Render free tier.
 ## Setup
 
 ### 1. Clone the repository
-```bash
 git clone https://github.com/okmijnuhb-maker/autonomous-ai-agent.git
+
 cd autonomous-ai-agent
-```
 
 ### 2. Install dependencies
-```bash
 python -m pip install -r requirements.txt
-```
 
 ### 3. Create .env file in project root
 GROQ_API_KEY=your_groq_api_key_here
 Get a free key at https://console.groq.com
 
 ### 4. Run locally
-```bash
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
 
 ### 5. Open in browser
 http://localhost:8000
@@ -52,22 +50,23 @@ http://localhost:8000
 
 This agent was built around 3 core capability types:
 
-**1. Conversational AI**
+### 1. Conversational AI
 - Multi-turn chat with context retention
 - Short-term deque buffer for recent messages
 - ChromaDB long-term vector memory with semantic recall across sessions
 
-**2. Task Automation**
-- 10 tools — calculator, weather, datetime, unit converter, dictionary,
-  Wikipedia, web search, file reader, CSV analyzer, system info
+### 2. Task Automation
+- 10 core tools — calculator, weather, datetime, unit converter, dictionary, Wikipedia, web search, file reader, CSV analyzer, system info
+- 4 additional utility tools — currency converter, text translator, QR code generator, password generator
 - Email tool and calendar management
-- File upload and analysis — PDF, CSV, TXT, JSON
+- File upload and analysis — PDF, DOCX, CSV, TXT, JSON
 
-**3. Web Search and Research**
+### 3. Web Search and Research
 - Real-time web search via DuckDuckGo
 - Multi-query planning and source ranking
 - Result summarization with confirmed vs uncertain facts
 - Follow-up detection with context injection
+- News-specific search — separates breaking news from general results
 - Persistent search history
 
 ---
@@ -75,10 +74,10 @@ This agent was built around 3 core capability types:
 ## Features
 
 - Multi-turn chat with persistent memory across sessions
-- 10 tools — calculator, weather, datetime, unit converter, dictionary,
-  Wikipedia, web search, file reader, CSV analyzer, system info
+- 14 tools — calculator, weather, datetime, unit converter, dictionary, Wikipedia, web search, file reader, CSV analyzer, system info, currency converter, text translator, QR code generator, password generator
 - Real-time web search with source ranking and summarization
-- File upload and analysis — PDF, CSV, TXT
+- Streaming responses — replies appear word by word like ChatGPT
+- File upload and analysis — PDF, DOCX, CSV, TXT
 - ChatGPT-style session history — save, reopen, delete conversations
 - Calendar management — add, delete, upcoming events
 - Voice input — speak your questions directly
@@ -91,6 +90,11 @@ This agent was built around 3 core capability types:
 
 ---
 
+## Tools (14 total)
+
+calculator, wikipedia, web_search, file_reader, datetime_tool, unit_converter, dictionary, weather, csv_analyzer, system_info, currency_converter, text_translator, qr_generator, password_generator
+
+---
 
 ## Notebooks
 
@@ -108,17 +112,18 @@ This agent was built around 3 core capability types:
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/chat` | POST | Send message, get reply |
-| `/memory` | GET | Memory stats |
-| `/tools` | GET | List all tools |
-| `/stats` | GET | Session performance stats |
-| `/search/history` | GET | Past web searches |
-| `/calendar` | GET | Upcoming events |
-| `/calendar/add` | POST | Add event |
-| `/calendar/{id}` | DELETE | Delete event |
-| `/sessions` | GET | All past sessions |
-| `/sessions/new` | POST | Start new session |
-| `/sessions/{id}` | DELETE | Delete session |
-| `/upload` | POST | Upload file |
-| `/export` | GET | Export session |
-| `/clear` | POST | Clear memory |
+| /chat | POST | Send message, get reply |
+| /chat/stream | POST | Streaming chat response |
+| /memory | GET | Memory stats |
+| /tools | GET | List all tools |
+| /stats | GET | Session performance stats |
+| /search/history | GET | Past web searches |
+| /calendar | GET | Upcoming events |
+| /calendar/add | POST | Add event |
+| /calendar/{id} | DELETE | Delete event |
+| /sessions | GET | All past sessions |
+| /sessions/new | POST | Start new session |
+| /sessions/{id} | DELETE | Delete session |
+| /upload | POST | Upload file |
+| /export | GET | Export session |
+| /clear | POST | Clear memory |
